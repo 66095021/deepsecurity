@@ -52,25 +52,28 @@ def send_file_to_capture_agent(server, filepath,filename):
     if is_pe(filetype):
         filename=filename+'.exe'
     headers = {
-	"Filename":filename,
+    "Filename":filename,
         "Content-type": "application/octet-stream",
         "Accept": "text/plain",
-	"Filetype": filetype
-	
+    "Filetype": filetype
+    
     }
 
     print "add the extension %s\n" %filename
     #conn = httplib.HTTPConnection("www.encodable.com/uploaddemo/")
-    conn = httplib.HTTPConnection(server, 58080)
+
+    try:
+        conn = httplib.HTTPConnection(server, 58080)
     #directly read whole file 
     #conn.request("POST", "/", open(filepath, "rb"),headers)
-    conn.request("POST", "/file/"+filename, open(filepath, "rb"),headers)
+        conn.request("POST", "/file/"+filename, open(filepath, "rb"),headers)
 
-    response = conn.getresponse()
-    remote_file = response.read()
-    conn.close()
-    print remote_file
-
+        response = conn.getresponse()
+        remote_file = response.read()
+        conn.close()
+        print remote_file
+    except Exception,ex:
+        print  "sdad",ex
 #send_file_to_capture_agent("/tmp/default.conf")
 
 
