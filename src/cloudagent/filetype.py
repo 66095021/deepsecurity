@@ -28,8 +28,9 @@ def is_compression(filemagic):
         return  1
     return  0
 def getfiletype(filename):
-    magic.Magic(magic_file='/tmp/Magdir/')
-    return magic.from_file(filename)
+    ms=magic.open(magic.MAGIC_NONE)
+    ms.load("/usr/share/misc/all.mgc")
+    return ms.file(filename)
 
 if __name__== '__main__':
     
@@ -37,6 +38,6 @@ if __name__== '__main__':
     print ret
     v=is_pe(ret)
     v=is_compression(ret)
-    v=is_pdf(ret)
+    #v=is_pdf(ret)
     print v
 

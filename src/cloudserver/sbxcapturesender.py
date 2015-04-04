@@ -38,9 +38,11 @@ def is_compression(filemagic):
     if  filemagic.find("POSIX tar archive")  != -1:
         return  1
     return  0
+
 def getfiletype(filename):
-    magic.Magic(magic_file='/tmp/Magdir/')
-    return magic.from_file(filename)
+    ms=magic.open(magic.MAGIC_NONE)
+    ms.load("/usr/share/misc/all.mgc")
+    return ms.file(filename)
 
 def send_file_to_capture_agent(server, filepath,filename):
     filetype=getfiletype(filepath)
