@@ -1,0 +1,57 @@
+#! /usr/bin/env bash
+#
+# Delete logs older than ${logexpireinterval} days, and remove entries in
+# stats.log older than ${statslogexpireinterval} days.
+
+. `dirname $0`/broctl-config.sh
+
+if [ "${statslogexpireinterval}" -ne "0" ]; then
+    slfile=${statsdir}/stats.log
+    if [ -s $slfile ]; then
+        now=`date +%s`
+
+        # Convert to seconds and subtract this from the current time
+        exptime=$(( now - 86400*statslogexpireinterval ))
+
+        # Determine how many lines to remove from the beginning of stats.log
+        nl=`awk -v expiretime=${exptime} '{ if ( $1 > expiretime ) { print NR-1; exit } }' $slfile`
+
+        if [ -z "${nl}" ]; then
+            > $slfile
+        elif [ ${nl} -gt 0 ]; then
+            sed "1,${nl}d" $slfile > $slfile.new
+            mv $slfile.new $slfile
+        fi
+    fi
+fi
+
+if [ "${logexpireinterval}" -eq "0" ]; then
+    exit 0
+fi
+
+if [ "${os}" == "openbsd" ]; then
+    find_cmd=gfind
+else
+    find_cmd=find
+fi
+
+base=${logdir}/
+
+file_pattern='.*/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/.*$'
+dir_pattern='.*/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$'
+
+exclude=""
+if [ "${keeplogs}" != "" ]; then
+   for name in ${keeplogs}; do
+      exclude="$exclude ! -name $name"
+   done
+fi
+
+# Remove old files.
+$find_cmd $base -type f -regex $file_pattern -mtime +${logexpireinterval} $exclude -delete 2>/dev/null
+rc=$?
+
+# Remove now empty directories (will fail for non-empty dirs).
+$find_cmd $base -type d -regex $dir_pattern -exec rmdir '{}' ';' 2>/dev/null
+
+exit $rc

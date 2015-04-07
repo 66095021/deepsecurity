@@ -1,0 +1,31 @@
+#! /usr/bin/env bash
+#
+#  start <cwd> <pin_cpu> <Bro args>
+
+. `dirname $0`/../broctl-config.sh
+
+cd $1 2>/dev/null
+shift
+
+rm -f .pid
+
+if [ ! -x ${scriptsdir}/run-bro ]; then
+    echo 1
+    echo ~~~
+    exit
+fi
+
+nohup ${scriptsdir}/run-bro "$@" >stdout.log 2>stderr.log &
+
+while [ ! -s .pid ]; do
+   sleep 1
+done
+
+ret=0
+pid=`cat .pid`
+[ "$pid" = "-1" ] && ret=1
+
+echo $pid
+echo $ret
+echo ~~~
+
