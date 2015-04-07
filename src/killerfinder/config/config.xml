@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+  <mode type="string">online</mode>
+  <packetNum type="int">-1</packetNum>
+  <dev type="string">wlan0</dev>
+  <filter type="string">port 80 or port 8080 or port 25</filter>
+  <httpPorts type="int">80;8080</httpPorts>
+  <smtpPorts type="int">25</smtpPorts>
+  <caredHttpMethods type="int">1;3;4</caredHttpMethods>
+  <caredContentTypes type="string">application;java;message;text</caredContentTypes>
+  <pcapTimeout type="int">0</pcapTimeout>
+  <maxDb type="int">10000</maxDb>
+  <m_logLevel type="int">6</m_logLevel>
+</root>
