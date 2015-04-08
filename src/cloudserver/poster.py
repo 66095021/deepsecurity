@@ -16,7 +16,7 @@ sys.path.append("/root/github/src/cloudserver")
 import magic
 import sys
 
-
+import json 
 
 
 log_forensic_json_info ={
@@ -40,7 +40,7 @@ def send_log_or_forensic_to_server(server):
         
         print  str(log_forensic_json_info)
     #conn.request("POST", "/", open(filepath, "rb"),headers)
-        conn.request("POST", "/", str(log_forensic_json_info) ,headers)
+        conn.request("POST", "/", json.JSONEncoder().encode(log_forensic_json_info) ,headers)
 
 
 
