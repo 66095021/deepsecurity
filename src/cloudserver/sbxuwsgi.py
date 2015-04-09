@@ -36,6 +36,7 @@ class application:
                 add_history_queue(jobkey)
                 jobinfo={}
                 jobinfo['status']='uploaded'
+                jobinfo['job_type']='file'
                 jobinfo['filename']=self.environ["HTTP_FILENAME"]
                 jobinfo['filepath']="/var/www/tmp/"+self.environ["HTTP_FILENAME"]
                 jobinfo['sha1sum']=self.environ["HTTP_SHA1SUM"]
@@ -51,6 +52,7 @@ class application:
                 add_history_queue(jobkey)
                 jobinfo={}
                 jobinfo['url']=self.environ["HTTP_URL"]   
+                jobinfo['job_type']='url'
                 add_info(jobkey, jobinfo)
                 return self.GET_index()
         else:

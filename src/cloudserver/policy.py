@@ -47,12 +47,14 @@ def get_valid_server(filetype):
         if filetype == "doc":
             doc_count=doc_count+1
             return  doc_servers[(doc_count%len(doc_servers))] 
-         
+        # in the filetype mode, if the filetype is NOT config, then we randomly it 
+        count=count+1
+        return  servers[(count%len(servers))]     
 
 if __name__=="__main__":
     
     while True:
-        a=get_valid_server("doc")
+        a=get_valid_server("url")
         print a
     
     
