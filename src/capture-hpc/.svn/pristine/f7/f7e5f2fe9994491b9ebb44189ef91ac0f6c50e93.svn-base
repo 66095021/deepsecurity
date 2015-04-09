@@ -1,0 +1,66 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:noNamespaceSchemaLocation="config.xsd">
+	<!-- version 2.6 -->
+	<global collect-modified-files="false" 
+			client-default="iexplorebulk"
+			client-default-visit-time="20"
+			capture-network-packets-malicious="false"
+			capture-network-packets-benign="false"
+			send-exclusion-lists="false"
+            terminate="true"
+            group_size="20"
+			vm_stalled_after_revert_timeout="120"
+            revert_timeout="120"
+            client_inactivity_timeout="60"
+            vm_stalled_during_operation_timeout="300"
+            same_vm_revert_delay="6"
+            different_vm_revert_delay="24"
+    />
+  <!--
+  <database database-type="PostgreSQL"
+		     database-url="jdbc:postgresql://localhost/capturehpc"
+	         database-username="capture"
+			 database-password="capture"
+	/>
+  -->
+  <!--
+	<database database-type="MySQL"
+		     database-url="jdbc:mysql://localhost/capturehpc"
+	         database-username="capture"
+			 database-password="capture"
+	
+	/>	
+  -->
+	<exclusion-list monitor="file" file="FileMonitor.exl" />
+	<exclusion-list monitor="process" file="ProcessMonitor.exl" />
+	<exclusion-list monitor="registry" file="RegistryMonitor.exl" />
+
+    <!--preprocessor classname="example">
+			<![CDATA[
+				<example-config attribute1="1.0" attribute2="40" attribute2="log/output.log"/>
+			]]>
+	</preprocessor-->
+
+    
+    <!--virtual-machine-server type="mock-vm-server" address="127.0.0.1" port="902"
+		username="User" password="Password">
+		<virtual-machine vm-path="dummyPath"
+						 client-path="dummyClientPath"
+						 username="User"
+						 password="Password"/>
+	</virtual-machine-server-->
+
+	<virtual-machine-server type="vmware-server" address="192.168.1.10" port="902"
+		username="User" password="Password">
+		<virtual-machine vm-path="C:\Virtual Machines\winxpsp2\winxpsp2.vmx"
+						 client-path="C:\Progra~1\capture\CaptureClient.bat"
+						 username="Administrator"
+						 password="password"/>
+	</virtual-machine-server>
+	
+	<!--postprocessor classname="example">
+			<![CDATA[
+				<example-config attribute1="1.0" attribute2="40" attribute2="log/output.log"/>
+			]]>
+	</postprocessor-->
+</config>

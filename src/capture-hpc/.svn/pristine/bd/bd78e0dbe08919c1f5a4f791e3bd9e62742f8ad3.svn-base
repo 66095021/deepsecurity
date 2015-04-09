@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DEFECTS>
+<OACRDEFECTCOUNT>1</OACRDEFECTCOUNT>
+<OACRERRORCOUNT>0</OACRERRORCOUNT>
+<DEFECT _seq="1"><SFA><LINE>38</LINE><COLUMN>62</COLUMN><FILENAME>eventlist.c</FILENAME><FILEPATH>e:\capture-hpc\capture-client\kerneldrivers\capturekerneldrivers\common\</FILEPATH></SFA><DEFECTCODE>6260</DEFECTCODE><DESCRIPTION>sizeof * sizeof is usually wrong. Did you intend to use a character count or a byte count?</DESCRIPTION><FUNCTION>InitialiseBufferManager</FUNCTION><FUNCLINE>28</FUNCLINE><PATH/></DEFECT>
+</DEFECTS>

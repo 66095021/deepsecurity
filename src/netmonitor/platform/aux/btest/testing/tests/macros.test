@@ -1,3 +1,0 @@
-# %TEST-EXEC: btest -d %INPUT
-
-@TEST-EXEC: cmp %DIR/macros.test %INPUT

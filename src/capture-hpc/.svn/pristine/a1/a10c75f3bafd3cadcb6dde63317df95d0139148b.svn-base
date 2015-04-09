@@ -1,0 +1,33 @@
+1. Capture Postprocessor Plug-in Architecture README
+---------------------------------------------------
+The Capture Postprocessor Plug-in Architecture is a feature that was added with version 3.0 of Capture-HPC. It allows to add plugins that further postprocess results (e.g. send malware files to AV engine, extract information from pcap file, etc)
+
+Postprocessors are configured and instantiated based on the postprocessor directive in the config.xml file. Capture will use the dynamic class loader to instantiate the postprocessor using the classname as the fully qualifying class name. The postprocessor plug-in’s configuration is provided via CDATA of the postprocessor tag. 
+
+2. Development
+--------------
+To develop a postprocessor plug-in, one simply needs to extend the abstract capture.Postprocessor class, implement a default constructor (can be empty) and the following functions:
+	/** This is the meat function of the Postprocessor. Whenever the state of the Url object changes
+     * this function is called. Primarily one would want to check for the visited state of the URL and then
+     * do some action.
+     *
+     */
+    public abstract void update(Observable o, Object arg);
+
+    /** function returns true if post processor is finished processing all update requests.
+     * this flag is used to assess whether capture can safely quit.
+     *
+     * @return true if finsished processing all update requests, false otherwise
+     */
+    public abstract boolean processing();
+
+    /* Sets the configuration of the preprocessor. Allows the preprocessor to be configured via the
+     * existing config.xml configuration file.
+     *
+     * @param configuration - from the CDATA element of the preprocessor xml tag of config.xml
+     */
+    abstract public void setConfiguration(String configuration);
+
+3. Running existing Postprocessor plugins
+----------------------------------------
+To run an existing plug-in, its class and libraries need to be added to the classpath when starting the Capture Server. A postprocessor configuration section must be added to the config.xml file according to the postprocessor plug-in’s documentation. The classname attribute of the postprocessor tag needs to be the fully qualifying class name of the postprocessor plug-in.

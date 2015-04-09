@@ -1,4 +1,0 @@
-# %TEST-EXEC-FAIL: btest %INPUT
-
-@TEST-EXEC: echo Hello, World!
-@TEST-EXEC: exit 1

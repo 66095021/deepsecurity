@@ -1,0 +1,18 @@
+
+
+386_OBJECTS=\
+ $(OBJ_PATH)\$O\eventlist.obj \
+ $(OBJ_PATH)\$O\sharedbuffer.obj \
+ $(OBJ_PATH)\$O\hashmap.obj \
+
+
+
+
+
+# lowercased
+BASEDIR=d:\winddk\760016~1.1
+OBJECT_ROOT=d:\winddk\760016~1.1
+MAKEDIR_LOWERCASE=e:\captur~1\captur~3\kernel~1\captur~1\common
+OBJ_PATH=e:\captur~1\captur~3\kernel~1\captur~1\common
+CONCURRENT_MIDL=0
+CONCURRENT_MANIFEST_BUILD=0

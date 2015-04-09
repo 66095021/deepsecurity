@@ -1,0 +1,100 @@
+Release Notes
+-------------
+
+Version 3.0.0
+-------------
+Changes
+-------
++ added connection monitor that can alert on connection/listening events on the network. This could be used to identify attacks that merely reside in memory.
++ added support for a backend mysql or postgress database
++ added post processor plugin architecture. Postprocessors allow to perform actions on classified URLs.
++ added a post processor that analyzes the network data of a classified URL. It extracts DNS information, HTTP requests and determines whether any domain name is part of a fast flux network. Note that this post processor only works with a group size of 1. Otherwise the network of the entire group is analyzed.
+
+
+Version 2.5.1
+-------------
+Changes
+-------
++ fixed issue of nullpointer exception on malicious URL when bulk algorithm is used and group size set to 1 (385)
++ added missing \n for each line in http log file (384)
++ fixed issue that didnt capture network dumps properly (384)
++ fixed bug that didnt handle circumstance when revert gets stuck. this leads to infinite ping/pongs. (383)
+
+Version 2.5
+-----------
+Changes
+-------
++ added preprocessor plugin architecture. Preprocessor plugins allow to handle the input urls before they are passed onto capture. For instance, this could be used to create a crawler or filtering plugin.
++ added processor ids for state changes (this value is only set if the client plug-in supports this). This allows the client plug-in to determine what URL the attack originates even if multiple URLs are visited at once. 
++ Added internetexplorerbulk plug-in that takes advantage of the processor id functionality. Allows to run multiple URLs without the need to revisit the URLs. A mapping of the state changes to the process id will determine which URL was malicious.
++ modified client plug-in to communicate the algorithm it is able to support (Divide-and-conquer, bulk, sequential)
++ upgraded vmware server to 1.0.6, java 6 update 7, NSIS 2.38, boost 1.35.0, visual studio 2008 (requires new VC++ Redist Libraries!)
++ removed timeout factor and added absolute timeout/delay config values (see documentation for description of each option)
++ modified tailing of input file; if no more URLs after a specific timeout are detected, the capture server can configured to terminate or keep tailing the input file for new URLs.
++ implemented staggering revert of virtual machines. If server is configured with multiple VMs, they are not all reverted at the same time.
++ changed threading structure to be more stable (leads to less client inactivity errors)
++ changed IE plugin to close all IE windows (fixes pop ups hanging around)
++ optimized handling of zipping of files - leads to speedup if network capture is not enabled
++ fixed bug 718,729,709
+
+Known Issues
+------------
+737 capture client crashes when installing a program (lots of events).
+736 When IE instance locks up, close method fails leading to a VM stalled error. (but those failures are now retried once)
+735 When Capture-Client crashes, it will lead to a client inactivity errors. (but those failures are now retried once)
+734 Terminate process is not recorded
+615 Registry monitoring can't handle a key named 
+690 Capture is not able to detect file renames
+676 Empty password on the user of the guest vm in the config.xml causes the capture server to crash (Windows only).
+706 Capture seems to ignore the VM server port.
+719 Closing a browser during visitation does not cause this event to be reported back to the server
+721 filedownloader writes to const file name preventing dac algorithm to be applied for applications that make use of this feature
+
+
+Version 2.1
+-----------
+Changes
+-------
++ Implemented divide & conquer algorithm that allows to visit URLs faster (685)
++ Added Safari plugin (693) (Note that the safari plug in does not support the divide & conquer algorithm.)
++ Network traffic collection can now be configured to occur on malicious as well as benign URLs. Previously, only network traffic on malicious URLs was pushed to the server. (707)
++ Added stats log to for tuning capture and troubleshooting issues.
++ Adjusted error handling. Now errors are only logged in the error.log file. The operator needs to decide on how to handle these errors.
++ Redirect client output to log file for debugging purposes. 
++ Added option -r to server parameters that can instruct the server to exit upon encountering an error (turn on by setting "-r true"). For debugging purposes.
++ A malicious classification is now reported even if the client machine crashes (e.g. drive by download causes blue screen).
++ Logs that capture state changes are now only created if state changes are detected.
++ The process,malicious,safe and eror log format now includes a new column that is related to the divide & conquer functionality . It shows the group ID number.
++ Because of the new features, the config file format has changed.
+	- the client-path attribute now points to a bat file
+	- global options changed and some were added
++ removed jni usage for revert and replaced with a stand alone C prg for stability reasons
++ fixed bug 696, 655, 657, 613, 689, 711
+
+
+Version 2.0.1
+-----------
+Changes
+-------
++ fixed bug 699, 666, 673
++ increased some timeouts on the server that trigger upon the client connecting to the server. Should allow to use more client instances with one server.
++ Capture-HPC is now compiled with Visual C++ SP1. As a result, the Visual C++ Redist Libraries SP1 are required to run Capture-HPC. One can still compile Capture-HPC without the service pack. However, we only destribute the version with service pack.
++ compiled vix libs are compatible with vmware server 1.0.4
+
+Version 2.0
+-----------
+Changes
+-------
++ support for any client application that is http protocol aware (for example, Microsoft Excel)
++ ability to automatically collect downloaded malware
++ ability to automatically collect network traffic on the client
++ ability to push exclusion lists from the Capture Server to the Capture Client
++ improved control of Internet Explorer: obtain html error codes; specify visitation delay AFTER page has been retrieved; retry visitation of URLs in case of time outs or network errors
++ support for plug-in architecture, that allows to create fine grained control of clients (for example, as provided for Internet Explorer), but also allows for integration of client applications that require complex interactions to retrieve content from the web (e.g. Safari is such an application. It doesn’t allow retrieval of web content by passing the URL as a parameter)
++ enhancement to file monitor to monitor file deletions
++ communication between Capture Client and Server has been converted to XML. This allows one to easily write custom Capture Servers that utilize the existing Capture Client.
++ added installer/uninstaller for the Capture Client
++ improved reporting
++ improved stability
++ improved performance
++ numerous bug fixes
