@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 import cgi
 import sys
+
 sys.path.append("/root/sbx")
 
 from sbxredis import *
 from sbxutil import *
-
+from logger  import * 
 def check_root():
     start_response('200 OK', [('Content-Type','text/html')])
     return  ["What? root?"]
@@ -22,26 +23,36 @@ class application:
 
     def __iter__(self):
         path = self.environ['PATH_INFO']
-        #if the put file 
+        #if the put file /,   put url  /url 
         if self.environ["REQUEST_METHOD"] ==  "PUT":
-            print self.environ
-            #print self.environ["HTTP_X_FILES"]
-            #print self.environ["HTTP_FILENAME"]
-            jobkey=get_uuid()
-            add_job_queue(jobkey)
-            add_history_queue(jobkey)
-            jobinfo={}
-            jobinfo['status']='uploaded'
-            jobinfo['filename']=self.environ["HTTP_FILENAME"]
-            jobinfo['filepath']="/var/www/tmp/"+self.environ["HTTP_FILENAME"]
-            jobinfo['sha1sum']=self.environ["HTTP_SHA1SUM"]
-            add_info(jobkey,jobinfo)
-            return  self.save_file(self.environ["HTTP_X_FILES"], self.environ["HTTP_FILENAME"])
-        if path == "/":
-            print self.environ
-            return self.GET_index()
-        elif path == "/hello":
-            return self.GET_hello()
+            if  path== "/":
+                logger.debug("get a FILE request")
+                logger.debug(self.environ)
+                print self.environ
+                #print self.environ["HTTP_X_FILES"]
+                #print self.environ["HTTP_FILENAME"]
+                jobkey=get_uuid()
+                add_job_queue(jobkey)
+                add_history_queue(jobkey)
+                jobinfo={}
+                jobinfo['status']='uploaded'
+                jobinfo['filename']=self.environ["HTTP_FILENAME"]
+                jobinfo['filepath']="/var/www/tmp/"+self.environ["HTTP_FILENAME"]
+                jobinfo['sha1sum']=self.environ["HTTP_SHA1SUM"]
+                add_info(jobkey,jobinfo)
+                return  self.save_file(self.environ["HTTP_X_FILES"], self.environ["HTTP_FILENAME"])
+            if path == "/url":
+                logger.debug("get a  URL request")    
+                logger.debug(self.environ)
+                logger.debug("the url is %s" %(self.environ["HTTP_URL"]))
+                #url is also a job to upload to clound
+                jobkey=get_uuid()
+                add_job_queue(jobkey)
+                add_history_queue(jobkey)
+                jobinfo={}
+                jobinfo['url']=self.environ["HTTP_URL"]   
+                add_info(jobkey, jobinfo)
+                return self.GET_index()
         else:
             return self.notfound()
 
