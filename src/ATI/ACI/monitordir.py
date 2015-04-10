@@ -18,7 +18,7 @@ import os
 import time
 
 import sys
-from dirtest import *
+from dirutil import *
 from filetype import * 
 from utils  import  * 
 from sophos   import * 
@@ -26,7 +26,7 @@ from checksig import *
 from decompress import * 
 from  uploadtocloud import * 
 from  fileusing     import * 
-
+from  logger import * 
 sys.path.append("/root/filterfile/code")
 
 monitordir="/tmp/"
@@ -46,11 +46,11 @@ def log_debug(msg):
     f.close()
 def filter_file(filename):
     filetype=getfiletype(filename)
-    print "checking the %s type, type is %s" %(filename, filetype)
+    logger.debug("checking the %s type, type is %s" %(filename, filetype))
 #if PE, sophos it, virus, log it and return
 #if no virus, verify the sig, no sig, send to clound. if sig ok, log and return.
     if is_pe(filetype):
-        print "%s is PE, will let sophos run it" %filename
+        logger.debug("%s is PE, will let sophos run it" %filename)
         ret=sophos_it(filename)
         if ret:
             log_virus(filename)
@@ -66,16 +66,16 @@ def filter_file(filename):
 # uncompression should return a tuple contains the uncompression file list.
     if is_compression(filetype):
         uncompression_list=uncompression(filename)
-        print "who is compression %s" %filename
+        logger.debug( "who is compression %s" %filename)
         if uncompression_list == None:
             return
         for i in uncompression_list:
             filter_file(i)
 
     test=is_pdf(filetype)
-    print "the %s value of %d\n" %(filename,test)
+    logger.debug("the %s value of %d\n" %(filename,test))
     if is_pdf(filetype):
-        print "%s is a pdf, will send it \n" %filename
+        logger.debug("%s is a pdf, will send it \n" %filename)
         send_to_clound(filename)
         return 
 #other type, just return
@@ -91,20 +91,20 @@ def run_loop(dir):
         #filelist=list(os.listdir(monitordir))
         filelist=get_files_for_dir(dir)     
    #print filelist
-        print "the loop number is %d, the total list is %s\n" %(number_loop,filelist)
+        logger.debug("the loop number is %d, the total list is %s\n" %(number_loop,filelist))
         for i  in filelist:
         #check whether it is done before 0 means using  by other process, 1 means NO
             if not verify_file_is_using(i):
-                print "the file %s is using by other process, leave it " %(i)
+                logger.debug( "the file %s is using by other process, leave it " %(i))
                 continue
             if not i in filedone:
                 print type(i)
                 filedone.append(i)
                 filter_file(i)
                  #time.sleep(1)
-                print "I will add %s done list \n" %i
+                logger.debug("I will add %s done list \n" %i)
             else:
-                print "it is in the done list now"
+                logger.debug( "it is in the done list now")
                  #print i
         time.sleep(5)
     
