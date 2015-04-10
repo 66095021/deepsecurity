@@ -2,7 +2,7 @@
 import httplib
 import subprocess
 import hashlib
-
+from logger import *  
 #this is used for upload file to cloud
 
 
@@ -20,13 +20,12 @@ def send_file_to_clound_from_agent(server, filepath,filename):
     try:
         conn = httplib.HTTPConnection(server, 80)
         conn.request("PUT", "/",   open(filepath, "rb") , headers)
-
+        logger.debug("send file %s to cloud,header %s" %(filepath,headers))
         response = conn.getresponse()
         remote_file = response.read()
         conn.close()
-        print remote_file
     except Exception,ex:
-        print  "sdad",ex
+        logger.debug( "There is connection issue "+str(ex))
 
 if __name__ == "__main__":
     send_file_to_clound_from_agent("127.0.0.1","/tmp/7za.exe","7za.exe")
