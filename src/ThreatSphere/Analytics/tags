@@ -1,0 +1,146 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+CLogReceiver	sbxlogserver.py	/^class CLogReceiver(basic.LineReceiver):$/;"	c
+CLogReceiver	testlogserver.py	/^class CLogReceiver(basic.LineReceiver):$/;"	c
+GET_hello	sbxincidentlogserver.py	/^    def GET_hello(self):$/;"	m	class:application
+GET_hello	sbxuwsgi.py	/^    def GET_hello(self):$/;"	m	class:application
+GET_index	sbxincidentlogserver.py	/^    def GET_index(self):$/;"	m	class:application
+GET_index	sbxuwsgi.py	/^    def GET_index(self):$/;"	m	class:application
+LOG_FILE	logger.py	/^LOG_FILE = '\/var\/log\/sbx.log'  $/;"	v
+Note	uploadnew.pl	/^Note: -r adds a random string at the end of a file$/;"	l
+__init__	sbxincidentlogserver.py	/^    def __init__(self, environ, start_response):$/;"	m	class:application
+__init__	sbxlogserver.py	/^	def __init__(self):$/;"	m	class:CLogReceiver
+__init__	sbxuwsgi.py	/^    def __init__(self, environ, start_response):$/;"	m	class:application
+__init__	testlogserver.py	/^	def __init__(self):$/;"	m	class:CLogReceiver
+__iter__	sbxincidentlogserver.py	/^    def __iter__(self):$/;"	m	class:application	file:
+__iter__	sbxuwsgi.py	/^    def __iter__(self):$/;"	m	class:application	file:
+a	log2file.py	/^a=open("\/var\/forensic\/file\/"+filename,"w")$/;"	v
+a	policy.py	/^        a=get_valid_server("doc")$/;"	v
+add_history_queue	sbxredis.py	/^def add_history_queue(jobname):$/;"	f
+add_info	sbxredis.py	/^def add_info(jobname,info):$/;"	f
+add_job_queue	sbxredis.py	/^def add_job_queue(jobname):$/;"	f
+application	sbxincidentlogserver.py	/^class application:$/;"	c
+application	sbxuwsgi.py	/^class application:$/;"	c
+base64	base64rw.py	/^import base64$/;"	i
+base64	log2file.py	/^import base64$/;"	i
+basic	sbxlogserver.py	/^from twisted.protocols import basic$/;"	i
+basic	testlogserver.py	/^from twisted.protocols import basic$/;"	i
+body	sbxincidentlogserver.py	/^	body=self.environ['wsgi.input'].read(request_body_size)$/;"	v	class:application
+body	sbxuwsgi.py	/^	body=self.environ['wsgi.input'].read(request_body_size)$/;"	v	class:application
+cgi	sbxincidentlogserver.py	/^import cgi$/;"	i
+cgi	sbxuwsgi.py	/^import cgi$/;"	i
+ch	logger.py	/^ch = logging.StreamHandler()$/;"	v
+check_root	sbxincidentlogserver.py	/^def check_root():$/;"	f
+check_root	sbxuwsgi.py	/^def check_root():$/;"	f
+connectionLost	sbxlogserver.py	/^	def connectionLost(self, reason):$/;"	m	class:CLogReceiver
+connectionLost	testlogserver.py	/^	def connectionLost(self, reason):$/;"	m	class:CLogReceiver
+connectionMade	sbxlogserver.py	/^	def connectionMade(self):$/;"	m	class:CLogReceiver
+connectionMade	testlogserver.py	/^	def connectionMade(self):$/;"	m	class:CLogReceiver
+count	policy.py	/^count=0$/;"	v
+createFD2Write	sbxlogserver.py	/^	def createFD2Write(self):$/;"	m	class:CLogReceiver
+createFD2Write	testlogserver.py	/^	def createFD2Write(self):$/;"	m	class:CLogReceiver
+d	log2file.py	/^    d=json.JSONDecoder().decode(line)$/;"	v
+decode_string	log2file.py	/^decode_string=base64.b64decode(d["body"])$/;"	v
+delimiter	sbxlogserver.py	/^	delimiter = '\\n' # unix terminal style newlines. remove this line$/;"	v	class:CLogReceiver
+delimiter	testlogserver.py	/^	delimiter = '\\n' # unix terminal style newlines. remove this line$/;"	v	class:CLogReceiver
+doc_count	policy.py	/^doc_count=0$/;"	v
+doc_servers	policy.py	/^doc_servers=jsonobj["doc"]$/;"	v
+encode	base64rw.py	/^   encode=get_base64_encode_string("\/tmp\/7za.exe")$/;"	v
+exe_count	policy.py	/^exe_count=0$/;"	v
+exe_servers	policy.py	/^exe_servers=jsonobj["exe"]$/;"	v
+f	log2file.py	/^f=open('\/var\/forensic\/foo','r')$/;"	v
+f	policy.py	/^f=file('.\/sbxserver.config', 'r')$/;"	v
+f	sbxincidentlogserver.py	/^	f = open('\/var\/forensic\/'+filename, 'a')$/;"	v	class:application
+f	sbxlogserver.py	/^f=protocol.Factory()$/;"	v
+f	sbxuwsgi.py	/^	f = open('\/var\/www\/tmp\/'+filename, 'w')$/;"	v	class:application
+f	testlogserver.py	/^f=protocol.Factory()$/;"	v
+filename	log2file.py	/^    filename=str(d["name"])$/;"	v
+filename	sbxcapturesender.py	/^           filename=info["filename"]$/;"	v
+filepath	sbxcapturesender.py	/^           filepath=info["filepath"]$/;"	v
+fmt	logger.py	/^fmt = '%(asctime)s - %(filename)s:%(lineno)s - %(name)s - %(message)s'  $/;"	v
+formatter	logger.py	/^formatter = logging.Formatter(fmt)   # ...formatter   $/;"	v
+get_base64_encode_string	base64rw.py	/^def get_base64_encode_string(file):$/;"	f
+get_file_from_base64_string	base64rw.py	/^def get_file_from_base64_string(content,file):$/;"	f
+get_info	sbxredis.py	/^def get_info(jobname):$/;"	f
+get_uuid	sbxutil.py	/^def get_uuid():$/;"	f
+get_valid_server	policy.py	/^def get_valid_server(filetype):$/;"	f
+getfiletype	sbxcapturesender.py	/^def getfiletype(filename):$/;"	f
+getfiletype	test.py	/^def getfiletype(filename):$/;"	f
+handler	logger.py	/^handler = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes = 1024*1024, backupCount = 5) # ...handler    $/;"	v
+handlers	logger.py	/^import logging.handlers  $/;"	i
+httplib	poster.py	/^import httplib$/;"	i
+httplib	sbxcapturesender.py	/^import httplib$/;"	i
+httplib	test.py	/^import httplib$/;"	i
+info	sbxcapturesender.py	/^       info = get_info(jobid)$/;"	v
+is_compression	sbxcapturesender.py	/^def is_compression(filemagic):$/;"	f
+is_compression	test.py	/^def is_compression(filemagic):$/;"	f
+is_pdf	sbxcapturesender.py	/^def is_pdf(filemagic):$/;"	f
+is_pdf	test.py	/^def is_pdf(filemagic):$/;"	f
+is_pe	sbxcapturesender.py	/^def is_pe(filemagic):$/;"	f
+is_pe	test.py	/^def is_pe(filemagic):$/;"	f
+jobid	sbxcapturesender.py	/^       jobid=remove_job_queue()$/;"	v
+json	log2file.py	/^import json$/;"	i
+json	policy.py	/^import json$/;"	i
+json	poster.py	/^import json $/;"	i
+jsonobj	policy.py	/^jsonobj=json.load(f)$/;"	v
+len	sbxincidentlogserver.py	/^	len=self.environ['CONTENT_LENGTH']$/;"	v	class:application
+len	sbxuwsgi.py	/^	len=self.environ['CONTENT_LENGTH']$/;"	v	class:application
+lineReceived	sbxlogserver.py	/^	def lineReceived(self, line):$/;"	m	class:CLogReceiver
+lineReceived	testlogserver.py	/^	def lineReceived(self, line):$/;"	m	class:CLogReceiver
+log_forensic_json_info	poster.py	/^log_forensic_json_info ={$/;"	v
+logger	logger.py	/^logger = logging.getLogger('sbx')    # ....tst.logger   $/;"	v
+logging	logger.py	/^import logging  $/;"	i
+logging	logger.py	/^import logging.handlers  $/;"	i
+magic	poster.py	/^import magic$/;"	i
+magic	sbxcapturesender.py	/^import magic$/;"	i
+magic	test.py	/^import magic$/;"	i
+notfound	sbxincidentlogserver.py	/^    def notfound(self):$/;"	m	class:application
+notfound	sbxuwsgi.py	/^    def notfound(self):$/;"	m	class:application
+os	sbxlogserver.py	/^import os$/;"	i
+os	testlogserver.py	/^import os$/;"	i
+pdf_count	policy.py	/^pdf_count=0$/;"	v
+pdf_servers	policy.py	/^pdf_servers=jsonobj["pdf"]$/;"	v
+policy	policy.py	/^policy=jsonobj["rule"]$/;"	v
+protocol	sbxlogserver.py	/^from twisted.internet import reactor, protocol$/;"	i
+protocol	testlogserver.py	/^from twisted.internet import reactor, protocol$/;"	i
+r	sbxredis.py	/^r = redis.Redis(host='127.0.0.1', port=6379, db=1)$/;"	v
+reactor	sbxlogserver.py	/^from twisted.internet import reactor, protocol$/;"	i
+reactor	testlogserver.py	/^from twisted.internet import reactor, protocol$/;"	i
+redis	sbxredis.py	/^import redis$/;"	i
+remove_job_queue	sbxredis.py	/^def remove_job_queue():$/;"	f
+request_body_size	sbxincidentlogserver.py	/^	request_body_size=int(len)$/;"	v	class:application
+request_body_size	sbxuwsgi.py	/^	request_body_size=int(len)$/;"	v	class:application
+revisitFD2Write	sbxlogserver.py	/^	def revisitFD2Write(self):$/;"	m	class:CLogReceiver
+revisitFD2Write	testlogserver.py	/^	def revisitFD2Write(self):$/;"	m	class:CLogReceiver
+saveIt	sbxlogserver.py	/^	def saveIt(self, rLogRecord):$/;"	m	class:CLogReceiver
+saveIt	testlogserver.py	/^	def saveIt(self, rLogRecord):$/;"	m	class:CLogReceiver
+save_file	sbxincidentlogserver.py	/^    def save_file(self, filename):$/;"	m	class:application
+save_file	sbxuwsgi.py	/^    def save_file(self,info, filename):$/;"	m	class:application
+send_file_to_capture_agent	sbxcapturesender.py	/^def send_file_to_capture_agent(server, filepath,filename):$/;"	f
+send_file_to_capture_agent	test.py	/^def send_file_to_capture_agent(server, filepath,filename):$/;"	f
+send_log_or_forensic_to_server	poster.py	/^def send_log_or_forensic_to_server(server):$/;"	f
+servers	policy.py	/^servers=jsonobj["server"]$/;"	v
+shutil	sbxlogserver.py	/^import shutil$/;"	i
+shutil	testlogserver.py	/^import shutil$/;"	i
+sleep	poster.py	/^from time import sleep$/;"	i
+sleep	sbxcapturesender.py	/^from time import sleep$/;"	i
+sleep	test.py	/^from time import sleep$/;"	i
+subprocess	poster.py	/^import subprocess$/;"	i
+subprocess	sbxcapturesender.py	/^import subprocess$/;"	i
+subprocess	test.py	/^import subprocess$/;"	i
+sys	poster.py	/^import sys$/;"	i
+sys	sbxcapturesender.py	/^import sys$/;"	i
+sys	sbxincidentlogserver.py	/^import sys$/;"	i
+sys	sbxuwsgi.py	/^import sys$/;"	i
+sys	test.py	/^import sys$/;"	i
+time	sbxlogserver.py	/^import time$/;"	i
+time	testlogserver.py	/^import time$/;"	i
+upload_file	sbxincidentlogserver.py	/^def upload_file():$/;"	f
+upload_file	sbxuwsgi.py	/^def upload_file():$/;"	f
+uuid	sbxutil.py	/^import uuid$/;"	i
+validateRawLogRecord	sbxlogserver.py	/^	def validateRawLogRecord(self, rLogRecord):$/;"	m	class:CLogReceiver
+validateRawLogRecord	testlogserver.py	/^	def validateRawLogRecord(self, rLogRecord):$/;"	m	class:CLogReceiver

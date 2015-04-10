@@ -1,0 +1,14 @@
+{
+"client_ip": "10.228.20.27",
+"destination_ip":"8.8.8.8",
+"incident_url":   "http://www.test.com/av.exe",
+"name":"av.exe",
+"body":"base64 encode of body", 
+"type":["virus", "thread","attck"],
+"time": "seconds UTC"
+"usage agent": "IE/Firefox",
+"record_type":[log, forensic],
+"engine_source":[sophos, bro, behavior-ax]
+}
+
+
