@@ -1,30 +1,40 @@
 #!/usr/bin/env python
 import os 
-
+import hashlib
 import time
 
+from logger import * 
 
+def get_sha1sum(file):
+    f=open(file, 'r')
+    s=f.read()
+    sha1sum_value=hashlib.sha1(s).hexdigest()
+    f.close()
+    return  sha1sum_value
 #return 1 if virus, else 0
 #there is a FIFO which is readed by really sophos virus program we made.
 # there is output /tmp/sophos_output. read it to get whether virus
 def sophos_it(filename):
-#send the name to sophos program
-    command="echo "+ filename+">/tmp/sophos_fifo &";
-    print "send the name to sophos fifo\n"
+#send the name/SHA1sum to new sophos program
+    hashvalue=get_sha1sum(filename)
+    command="echo "+ filename+" " +hashvalue+">/tmp/sophos_fifo &";
+    logger.debug( "send the file %s sha1sum %s to sophos fifo"%(filename,hashvalue))
     os.system(command)
 #check the result 
-    time.sleep(6)
+    time.sleep(2)
 # 2 means waiting the result, 0  means no virus, 1 means virus
     ret=2
 #iterate the file
     f=open('/tmp/sophos_out','r')
     for line in f:
-        print "iterate the sophos_out %s to find the result \n" %line
+        logger.debug( "iterate the sophos_out %s to find the result " %line)
         #print    type(line)
-        if line.split(" ")[0].strip()== filename:
-            ret=int(line.split(" ")[1].strip())
-            print "Now, we match the result %s  the ret is %d\n" %(line,ret)
+        if line.split(" ")[1].strip()== hashvalue:
+            ret=int(line.split(" ")[2].strip())
+            logger.debug ("Now, we match the result %s  the ret is %d\n" %(line,ret))
             break
+        else:
+            logger.debug("this line does NOT match,continue");
     f.close()
     return ret
 if __name__== '__main__':
