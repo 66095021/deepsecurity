@@ -19,7 +19,7 @@ import sys
 import json 
 
 
-log_forensic_json_info ={
+forensic_data_json_info ={
 
 "client_ip": "10.228.20.27",
 "destination_ip":"8.8.8.8",
@@ -31,16 +31,47 @@ log_forensic_json_info ={
 "usage agent": "IE/Firefox",
 "record_type":"log"
 }
-def send_log_or_forensic_to_server(server):
-    global log_forensic_json_info
+incident_log_json_info ={
+
+"client_ip": "10.228.20.27",
+"destination_ip":"8.8.8.8",
+"incident_url":   "http://www.test.com/av.exe",
+"name":"av.exe",
+"type":"virus",
+"time": "seconds UTC",
+"usage agent": "IE/Firefox",
+"record_type":"log"
+}
+
+
+def send_forensic_data_to_server(server):
+    global forensic_data_json_info
     try:
         conn=httplib.HTTPConnection(server,9999)
-        headers={"test":"test"}
-        log_forensic_json_info["body"]=get_base64_encode_string("/tmp/7za.exe")
+        headers={"infotype":"forensic"}
+        forensic_data_json_info["body"]=get_base64_encode_string("/tmp/7za.exe")
         
-        print  str(log_forensic_json_info)
+        print  str(forensic_data_json_info)
     #conn.request("POST", "/", open(filepath, "rb"),headers)
-        conn.request("POST", "/", json.JSONEncoder().encode(log_forensic_json_info) ,headers)
+        conn.request("POST", "/", json.JSONEncoder().encode(forensic_data_json_info) ,headers)
+
+
+
+
+
+        response = conn.getresponse()
+        remote_file = response.read()
+        conn.close()
+        print remote_file
+    except Exception,ex:
+        print  "sdad",ex
+#send_file_to_capture_agent("/tmp/default.conf")
+def send_incident_log_to_server(server):
+    global incident_log_json_info
+    try:
+        conn=httplib.HTTPConnection(server,9999)
+        headers={"infotype":"incident"}
+        conn.request("POST", "/", json.JSONEncoder().encode(incident_log_json_info) ,headers)
 
 
 
@@ -56,4 +87,5 @@ def send_log_or_forensic_to_server(server):
 
 
 if __name__ == "__main__":
-           send_log_or_forensic_to_server(sys.argv[1])
+           send_forensic_data_to_server(sys.argv[1])
+           #send_incident_log_to_server( sys.argv[1])
