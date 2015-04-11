@@ -2,7 +2,8 @@
 import os 
 import hashlib
 import time
-
+import sys
+sys.path.append("/opt/ATI")
 from logger import * 
 
 def get_sha1sum(file):
