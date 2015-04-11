@@ -2,6 +2,10 @@
 import httplib
 import subprocess
 import hashlib
+
+import sys
+sys.path.append("/opt/ATI")
+
 from logger import * 
 #this is used for sending a url to cloud server
 
