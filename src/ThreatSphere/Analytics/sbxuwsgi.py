@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import cgi
 import sys
-
-sys.path.append("/root/sbx")
+import json
+sys.path.append("/opt/ThreatSphere")
 
 from sbxredis import *
 from sbxutil import *
@@ -28,6 +28,7 @@ class application:
             if  path== "/":
                 logger.debug("get a FILE request")
                 logger.debug(self.environ)
+                logger.debug(type(self.environ))
                 print self.environ
                 #print self.environ["HTTP_X_FILES"]
                 #print self.environ["HTTP_FILENAME"]
@@ -84,5 +85,17 @@ class application:
 	body=self.environ['wsgi.input'].read(request_body_size)
 	f.write(body)
 	f.close
+        # we also write the meta into file, so that we can match information later
+        tmp_dict={"filename": self.environ["HTTP_FILENAME"], 
+                  "x-files":  self.environ["HTTP_X_FILES"],
+                   "sha1sum": self.environ["HTTP_SHA1SUM"],
+                   "meta"  : self.environ["HTTP_META"]
+                 }
+        k=json.JSONEncoder().encode(tmp_dict)
+        print k
+        f=open('/var/ATI/uploadfile.meta', 'a')
+        f.write(k)
+        f.write('\n')
+        f.close()
 	yield self.environ["REQUEST_METHOD"]+self.environ["PATH_INFO"]
         
