@@ -18,8 +18,14 @@ def get_files_for_dir(dir):
         #print(type (os.path.join(root, filename)))
 
 
-
+def get_file_size(filename):
+    try:
+        size=os.path.getsize(filename)
+        return size
+    except :
+	return -1
+ 
 if __name__ =='__main__':
     foo=get_files_for_dir(sys.argv[1])
-
+    foo=get_file_size(   (sys.argv[1]))
     print foo

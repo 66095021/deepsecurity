@@ -46,6 +46,9 @@ def log_debug(msg):
     f.write(msg)
     f.close()
 def filter_file(filename):
+    if  get_file_size(filename) == -1 or get_file_size(filename) > file_size_max:
+        logger.debug("the file does NOT exist or the file size is above the max, did NOT filter it")
+        return  
     filetype=getfiletype(filename)
     logger.debug("checking the %s type, type is %s" %(filename, filetype))
 #if PE, sophos it, virus, log it and return
@@ -107,7 +110,7 @@ def run_loop(dir):
             else:
                 logger.debug( "it is in the done list now")
                  #print i
-        time.sleep(5)
+        time.sleep(1)
     
 
 if __name__== '__main__':
