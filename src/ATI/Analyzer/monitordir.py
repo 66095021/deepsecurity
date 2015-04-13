@@ -29,7 +29,7 @@ from decompress import *
 from  uploadtocloud import * 
 from  fileusing     import * 
 from  logger import * 
-
+from analyzer_config import * 
 monitordir="/tmp/"
 #contain the current files 
 filelist=[]
@@ -111,5 +111,5 @@ def run_loop(dir):
     
 
 if __name__== '__main__':
-    run_loop(sys.argv[1])
+    run_loop(file_trunk_dir)
 
