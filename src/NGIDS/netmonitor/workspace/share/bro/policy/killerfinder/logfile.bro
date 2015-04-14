@@ -1,4 +1,38 @@
+export{
 
+    global extract_name_from_uri: function (uri : string) : string; 
+
+}
+
+function extract_name_from_uri(uri : string) : string
+{
+    local name = "noname";
+
+    # http://www.baidu.com
+    local i = strstr(uri, "://") ;
+    if (i != 0){
+      uri = sub_bytes(uri, i+3, |uri|-i-2);
+      print uri;
+    }
+
+
+    if (strstr(uri, "/") == 0){
+        return name;
+    }
+
+    local paths = split(uri, /\//);
+    local tmp = paths[|paths|];
+    if (tmp == ""){
+       return name;
+    }else{
+      local r = split1(tmp, /[\?#]/)[1];
+      if (r == ""){
+        return name;
+      }else{
+        return r;
+      }
+    }
+}
 
 
 ######################################
@@ -145,6 +179,10 @@ event file_state_remove(f: fa_file)
         return;
     }
     f$info$desc = Files::describe(f);
+
+    if ( f$source == "HTTP" && ! f$info?$filename ){
+        f$info$filename = extract_name_from_uri(f$info$desc);
+    }
 }
 
 event file_over_new_connection(f: fa_file , c: connection , is_orig: bool )
