@@ -41,6 +41,11 @@ class application:
                 jobinfo['filename']=self.environ["HTTP_FILENAME"]
                 jobinfo['filepath']="/var/www/tmp/"+self.environ["HTTP_FILENAME"]
                 jobinfo['sha1sum']=self.environ["HTTP_SHA1SUM"]
+                #add the meta  and client ip 
+                jobinfo['meta'] = self.environ["HTTP_META"]
+                k=json.JSONDecoder().decode(self.environ["HTTP_META"])
+                client_ip=str(k["details"][0]).split(',')[0].split('=')[-1]
+                jobinfo['client_ip']=client_ip
                 add_info(jobkey,jobinfo)
                 return  self.save_file(self.environ["HTTP_X_FILES"], self.environ["HTTP_FILENAME"])
             if path == "/url":
