@@ -60,7 +60,8 @@ def send_url_to_capture_agent( url):
     except Exception,ex:
         print  "sdad",ex
 
-def send_file_to_capture_agent( filepath,filename):
+#add the job info, so that we can get client ip of this file
+def send_file_to_capture_agent( filepath,filename,info):
     filetype=getfiletype(filepath)
     #if pdf, hacked, add the pdf extenstion
     if is_pdf(filetype):
@@ -89,7 +90,7 @@ def send_file_to_capture_agent( filepath,filename):
         if tmp  == "WCG_PDF":
             type="pdf"
 
-        server=get_valid_server(type)
+        server=get_valid_server(type,info["client_ip"])
         logger.debug("choose server %s, type %s" %(server, type))
         conn = httplib.HTTPConnection(server, 58080)
     #directly read whole file 
@@ -113,10 +114,9 @@ if __name__ == "__main__":
            if info["job_type"] == "file":
                filepath=info["filepath"]
                filename=info["filename"]
-               print "I will send %s %s" %(filepath, filename)
-               logger.debug("will send %s %s" %(filepath,filename))
+               logger.debug("job is file , will send local file path %s filename %s" %(filepath,filename))
                #server is configurable, remove the  hardcode now
-               send_file_to_capture_agent(filepath,filename)
+               send_file_to_capture_agent(filepath,filename,info)
                
            else:
                send_url_to_capture_agent(info["url"])
