@@ -26,10 +26,11 @@ from utils  import  *
 from sophos   import * 
 from checksig import * 
 from decompress import * 
-from  uploadtocloud import * 
+#from  uploadtocloud import * 
 from  fileusing     import * 
 from  logger import * 
 from analyzer_config import * 
+from uploadfile import * 
 monitordir="/tmp/"
 #contain the current files 
 filelist=[]
@@ -65,7 +66,7 @@ def filter_file(filename):
             log_sig_ok(filename)
             return
         else:
-            send_to_clound(filename)
+            send_file_to_clound_from_agent(filename)
             return
 # uncompression should return a tuple contains the uncompression file list.
     if is_compression(filetype):
@@ -80,7 +81,7 @@ def filter_file(filename):
     logger.debug("the %s value of %d\n" %(filename,test))
     if is_pdf(filetype):
         logger.debug("%s is a pdf, will send it \n" %filename)
-        send_to_clound(filename)
+        send_file_to_clound_from_agent(filename)
         return 
 #other type, just return
     return
@@ -98,10 +99,13 @@ def run_loop(dir):
         logger.debug("the loop number is %d, the total list is %s\n" %(number_loop,filelist))
         for i  in filelist:
         #check whether it is done before 0 means using  by other process, 1 means NO
-            if not verify_file_is_using(i):
-                logger.debug( "the file %s is using by other process, leave it " %(i))
-                continue
+            #if not verify_file_is_using(i):
+             #   logger.debug( "the file %s is using by other process, leave it " %(i))
+              #  continue
             if not i in filedone:
+                if  not verify_file_is_using(i):
+                    logger.debug( "the file %s is using by other process, leave it " %(i))
+                    continue
                 print type(i)
                 filedone.append(i)
                 filter_file(i)
