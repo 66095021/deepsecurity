@@ -28,7 +28,7 @@ def uncompression(filename):
         return ret
     if  zipfile.is_zipfile(filename):
         zfile = zipfile.ZipFile(filename)
-        zfile.extractall("/tmp/decompression")
+        zfile.extractall("/tmp/decompression/"+filename.split('/')[-1])
         ret=get_files_for_dir("/tmp/decompression")
         return ret
 
