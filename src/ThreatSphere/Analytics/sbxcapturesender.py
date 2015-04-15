@@ -61,7 +61,7 @@ def send_url_to_capture_agent( url):
         print  "sdad",ex
 
 #add the job info, so that we can get client ip of this file
-def send_file_to_capture_agent( filepath,filename,info):
+def send_file_to_capture_agent( filepath,filename,info,jobid):
     filetype=getfiletype(filepath)
     #if pdf, hacked, add the pdf extenstion
     if is_pdf(filetype):
@@ -106,6 +106,7 @@ def send_file_to_capture_agent( filepath,filename,info):
         print remote_file
     except Exception,ex:
         print  "sdad",ex
+        add_job_queue(jobid)
 #send_file_to_capture_agent("/tmp/default.conf")
 
 
@@ -119,7 +120,7 @@ if __name__ == "__main__":
                filename=info["filename"]
                logger.debug("job is file , will send local file path %s filename %s" %(filepath,filename))
                #server is configurable, remove the  hardcode now
-               send_file_to_capture_agent(filepath,filename,info)
+               send_file_to_capture_agent(filepath,filename,info,jobid)
                
            else:
                send_url_to_capture_agent(info["url"])
