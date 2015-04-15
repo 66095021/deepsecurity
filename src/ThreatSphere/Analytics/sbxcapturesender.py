@@ -118,7 +118,7 @@ if __name__ == "__main__":
            if info["job_type"] == "file":
                filepath=info["filepath"]
                filename=info["filename"]
-               logger.debug("job is file , will send local file path %s filename %s" %(filepath,filename))
+               logger.debug("job quque has job , will send local file path %s filename %s" %(filepath,filename))
                #server is configurable, remove the  hardcode now
                send_file_to_capture_agent(filepath,filename,info,jobid)
                
@@ -126,4 +126,5 @@ if __name__ == "__main__":
                send_url_to_capture_agent(info["url"])
        else:
            print "there is nothing in the job queue"
+           logger.debug("job queue is nothing")
        sleep(5)
