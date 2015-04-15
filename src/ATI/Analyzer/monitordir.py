@@ -76,6 +76,7 @@ def filter_file(filename):
             return
         for i in uncompression_list:
             filter_file(i)
+        os.system("rm /tmp/decompression/* -rf")
 
     test=is_pdf(filetype)
     logger.debug("the %s value of %d\n" %(filename,test))
