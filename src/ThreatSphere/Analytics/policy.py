@@ -6,7 +6,7 @@ import time
 import sys
 sys.path.append("/opt/ThreatSphere")
 from logger import * 
-f=file('./sbxserver.config', 'r')
+f=file('/opt/ThreatSphere/sbxserver.config', 'r')
 jsonobj=json.load(f)
 #print type(jsonobj)
 #print jsonobj.keys()

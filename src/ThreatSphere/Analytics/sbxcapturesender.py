@@ -65,9 +65,11 @@ def send_file_to_capture_agent( filepath,filename,info):
     filetype=getfiletype(filepath)
     #if pdf, hacked, add the pdf extenstion
     if is_pdf(filetype):
-        filename=filename+'.pdf'
+        if '.pdf' not in  filename:
+            filename=filename+'.pdf'
     if is_pe(filetype):
-        filename=filename+'.exe'
+       if '.exe' not in filename:
+            filename=filename+'.exe'
     headers = {
     "Filename":filename,
         "Content-type": "application/octet-stream",
@@ -96,6 +98,7 @@ def send_file_to_capture_agent( filepath,filename,info):
     #directly read whole file 
     #conn.request("POST", "/", open(filepath, "rb"),headers)
         conn.request("POST", "/file/"+type+"/"+filename, open(filepath, "rb"),headers)
+        logger.debug("will post to capture filename is %s, local filename is  %s, full url is %s "%(filename,filepath,"/file/"+type+"/"+filename))
 
         response = conn.getresponse()
         remote_file = response.read()
