@@ -29,19 +29,5 @@ event Intel::log_intel(rec: Intel::Info)
 
 
 
-event connection_SYN_packet(c: connection , pkt: SYN_packet )
-{
-    #debug("+connection_SYN_packet");
-    #print fmt("%s", network_time()); 
-    #Intel::seen([$indicator="test", $indicator_type=Intel::ADDR, $host=c$id$resp_h, $where=Intel::IN_ANYWHERE,$conn=c]);
-}
 
-event new_connection(c: connection)
-{
-#    Intel::seen([$indicator="test", $indicator_type=Intel::ADDR, $host=c$id$resp_h, $where=Intel::IN_ANYWHERE,$conn=c]);
-}
-
-event http_request(c: connection , method: string , original_URI: string , unescaped_URI: string , version: string ){
-#    Intel::seen([$indicator="test", $indicator_type=Intel::ADDR, $host=c$id$resp_h, $where=Intel::IN_ANYWHERE,$conn=c]);
-}
 

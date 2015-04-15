@@ -16,11 +16,15 @@ event http_header(c: connection, is_orig: bool, name: string, value: string)
 					     $where=HTTP::IN_HOST_HEADER]);
 			else
 				{
+				Intel::seen([$indicator=value,
+                                             $indicator_type=Intel::DOMAIN,
+                                             $conn=c,
+                                             $where=HTTP::IN_HOST_HEADER]);
+
 				local parts = split(value, /\./);
 				local domain = value;
 				if (|parts| > 2)
 					domain = parts[|parts|-1] + "." + parts[|parts|];
-				print domain;			
 				Intel::seen([$indicator=domain,
 					     $indicator_type=Intel::DOMAIN,
 					     $conn=c,

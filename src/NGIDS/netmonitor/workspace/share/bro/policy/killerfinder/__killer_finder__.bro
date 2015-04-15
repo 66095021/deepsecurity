@@ -1,13 +1,14 @@
 export {
 
-  redef interfaces += "wlan0";
   redef interfaces += "lo";
   redef LogAscii::use_json = T;
  #redef FileExtract::prefix = "/tmp/brofiles/";
-  redef Intel::read_files += { "/usr/local/bro/example.db",
-                               "/usr/local/bro/ip4.db",
-                               "/usr/local/bro/domain.db",
-                               "/usr/local/bro/url.db" };  
+  redef Intel::read_files += { "/usr/local/bro/db/example.db",
+                              #"/usr/local/bro/db/2_0_dest.db",
+                              #"/usr/local/bro/db/2_1_dest.db",
+                              #"/usr/local/bro/db/2_4_dest.db",  
+                              #"/usr/local/bro/db/2_4_url.db",
+                               "/no"};  
  
 
   global sendrst = "/usr/local/bro/bin/rst";
@@ -16,14 +17,15 @@ export {
   global line_sep = "\r\n";
   global caredtypes : set[string] = set(
                           "application", 
-                          "audio",
+                         #"audio",
                           "example", 
-                          "image", 
+                         #"image", 
                           "message", 
                           "model", 
                           "multipart", 
-                          "text", 
-                          "video"
+                         #"text", 
+                         #"video",
+                          "end"
                          ); 
   
   
