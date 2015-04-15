@@ -99,11 +99,11 @@ def send_file_to_capture_agent( filepath,filename,info,jobid):
     #conn.request("POST", "/", open(filepath, "rb"),headers)
         conn.request("POST", "/file/"+type+"/"+filename, open(filepath, "rb"),headers)
         logger.debug("will post to capture filename is %s, local filename is  %s, full url is %s "%(filename,filepath,"/file/"+type+"/"+filename))
-
-        response = conn.getresponse()
-        remote_file = response.read()
+        #capture is async, so discard the response
+        #response = conn.getresponse()
+        #remote_file = response.read()
         conn.close()
-        print remote_file
+        #print remote_file
     except Exception,ex:
         print  "sdad",ex
         add_job_queue(jobid)
@@ -127,4 +127,4 @@ if __name__ == "__main__":
        else:
            print "there is nothing in the job queue"
            logger.debug("job queue is nothing")
-       sleep(5)
+       sleep(1)
