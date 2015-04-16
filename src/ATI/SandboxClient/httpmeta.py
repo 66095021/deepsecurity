@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import json
+import  os 
 import base64
 import sys
 sys.path.append("/opt/ATI")
@@ -12,6 +13,9 @@ from logger import *
 
 from analyzer_config import * 
 def get_line_contain_fuid(filename):
+    if not os.path.exists(file_meta_info_dir):
+        logger.debug("file meta file does NOT existt")
+        return 
 #normal case,
     if not "/tmp/decompression" in filename:
        fuid=filename.split('/')[-1].split('.')[0]
@@ -39,6 +43,9 @@ def get_line_contain_fuid(filename):
        f.close()
        return 
 def get_real_name_from_fuid(filename):
+    if not os.path.exists(file_meta_info_dir):
+        logger.debug("file meta file does NOT existt")
+        return 
 #normal case 
     if not "/tmp/decompression" in filename:
         fuid=filename.split('/')[-1].split('.')[0]

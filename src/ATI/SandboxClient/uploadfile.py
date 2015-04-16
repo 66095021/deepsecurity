@@ -19,6 +19,9 @@ def send_file_to_clound_from_agent(filepath):
     logger.debug("the uploading file %s meta is %s" %(filepath,meta))
     logger.debug("the uploading file  %s realname is %s"%(filepath,filename))
     print type(meta)
+    if meta == None or filename == None:
+        logger.debug("the uploading file meta or realname is none, discard")
+        return
     f=open(filepath, 'r')
     s=f.read()
     f.close()
