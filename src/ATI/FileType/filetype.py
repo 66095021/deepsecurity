@@ -2,14 +2,19 @@
 import magic
 import sys
 
-
+#can not use WCG_EXE because WCG_EXE contains the linux exe also
 def is_pe(filemagic):
     if filemagic.find("PE32") != -1:
         return 1
     else: 
         return 0
 def is_pdf(filemagic):
-    if filemagic.find("PDF") != -1:
+    if filemagic.find("WCG_PDF") != -1:
+        return 1
+    else:
+        return 0 
+def is_doc(filemagic):
+    if filemagic.find("WCG_DOC") != -1:
         return 1
     else:
         return 0 
@@ -36,8 +41,9 @@ if __name__== '__main__':
     
     ret=getfiletype(sys.argv[1])
     print ret
-    v=is_pe(ret)
-    v=is_compression(ret)
-    #v=is_pdf(ret)
-    print v
+    pe=is_pe(ret)
+    compression=is_compression(ret)
+    pdf=is_pdf(ret)
+    doc=is_doc(ret)
+    print "PE" ,pe , "compression",compression, "PDF",pdf, "doc",doc
 

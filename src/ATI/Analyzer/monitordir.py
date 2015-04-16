@@ -84,6 +84,10 @@ def filter_file(filename):
         logger.debug("%s is a pdf, will send it \n" %filename)
         send_file_to_clound_from_agent(filename)
         return 
+    if is_doc(filetype):
+        logger.debug("%s is a doc, will send it \n" %filename)
+        send_file_to_clound_from_agent(filename)
+        return
 #other type, just return
     return
  
