@@ -116,6 +116,8 @@ def run_loop(dir):
                 filter_file(i)
                  #time.sleep(1)
                 logger.debug("I will add %s done list \n" %i)
+                os.system("rm -rf "+ i)
+                logger.debug("remove the file %s since it is done" %i)
             else:
                 logger.debug( "it is in the done list now")
                  #print i
