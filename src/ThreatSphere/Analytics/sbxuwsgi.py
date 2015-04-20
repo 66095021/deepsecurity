@@ -2,6 +2,7 @@
 import cgi
 import sys
 import json
+import os
 sys.path.append("/opt/ThreatSphere")
 
 from sbxredis import *
@@ -86,7 +87,8 @@ class application:
         self.start('200 OK', [('Content-Type','text/html')])
 	len=self.environ['CONTENT_LENGTH']
 	request_body_size=int(len)
-	f = open('/var/www/tmp/'+filename, 'w')
+        os.system("mkdir -p /var/ThreatSphere/uploadfiles/")
+	f = open('/var/ThreatSphere/uploadfiles/'+filename, 'w')
 	body=self.environ['wsgi.input'].read(request_body_size)
 	f.write(body)
 	f.close
@@ -98,7 +100,7 @@ class application:
                  }
         k=json.JSONEncoder().encode(tmp_dict)
         print k
-        f=open('/var/ATI/uploadfile.meta', 'a')
+        f=open('/var/ThreatSphere/uploadfile.meta', 'a')
         f.write(k)
         f.write('\n')
         f.close()
