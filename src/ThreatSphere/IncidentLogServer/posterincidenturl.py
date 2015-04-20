@@ -2,9 +2,7 @@
 import httplib
 import subprocess
 from time import sleep
-from sbxredis import * 
 
-from base64rw import * 
 import sys
 sys.path.append("/root/sbx")
 sys.path.append("/root/github/src/cloudserver")
