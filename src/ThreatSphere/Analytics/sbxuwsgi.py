@@ -40,7 +40,7 @@ class application:
                 jobinfo['status']='uploaded'
                 jobinfo['job_type']='file'
                 jobinfo['filename']=self.environ["HTTP_FILENAME"]
-                jobinfo['filepath']="/var/www/tmp/"+self.environ["HTTP_FILENAME"]
+                jobinfo['filepath']="/var/ThreatSphere/uploadfiles/"+self.environ["HTTP_FILENAME"]
                 jobinfo['sha1sum']=self.environ["HTTP_SHA1SUM"]
                 #add the meta  and client ip 
                 jobinfo['meta'] = self.environ["HTTP_META"]
