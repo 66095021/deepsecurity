@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 import httplib
 import subprocess
-from time import sleep
-
+import  time
 import sys
-sys.path.append("/root/sbx")
-sys.path.append("/root/github/src/cloudserver")
 #this script checks the job queue and send the file to capture agent if there is job.
 #it can run forever
 
@@ -87,5 +84,6 @@ if __name__ == "__main__":
            incident_log_json_info["destination_ip"]=sys.argv[3]
            incident_log_json_info["incident_url"]=sys.argv[4]
            incident_log_json_info["type"]=sys.argv[5]
+           incident_log_json_info["time"]=time.ctime()
            #send_forensic_data_to_server(sys.argv[1])
            send_incident_log_to_server( sys.argv[1])
