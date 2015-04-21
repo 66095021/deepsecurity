@@ -31,6 +31,8 @@ def is_compression(filemagic):
     # tar 
     if  filemagic.find("POSIX tar archive")  != -1:
         return  1
+    if  filemagic.find("RAR archive data")  != -1:
+        return 1
     return  0
 def getfiletype(filename):
     ms=magic.open(magic.MAGIC_NONE)
