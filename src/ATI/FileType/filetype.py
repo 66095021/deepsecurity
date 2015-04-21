@@ -4,7 +4,7 @@ import sys
 
 #can not use WCG_EXE because WCG_EXE contains the linux exe also
 def is_pe(filemagic):
-    if filemagic.find("PE32") != -1:
+    if filemagic.find("WCG_EXE") != -1:
         return 1
     else: 
         return 0
