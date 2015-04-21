@@ -90,62 +90,63 @@ event http_request(c: connection , method: string , original_URI: string , unesc
 
 
 event http_header(c: connection, is_orig: bool, name: string, value: string)
-	{
-	if ( is_orig )
-		{
-		switch ( name ) 
-			{
-			case "HOST":
-			#if ( is_valid_ip(value) )
-			#else
-			{
-                          local parts = split(value, /\./);
-                          if (|parts| > 2){
-                              local domain = parts[|parts|-1] + "." + parts[|parts|];
-                              if (c$http$malicous_state == 0){
-                                if (domain in http_domain_list){
-                                  c$http$malicous_state = 1;
-                                  NOTICE([$note=DOMAIN_MAL,
+{
+    if ( is_orig ){
+        switch ( name ) {
+        case "HOST":
+        #if ( is_valid_ip(value) )
+        #else
+        {
+          local parts = split(value, /\./);
+          if (|parts| > 2){
+             local domain = parts[|parts|-1] + "." + parts[|parts|];
+             if (c$http$malicous_state == 0){
+                 debug(fmt("domain search begin: %s",current_time()));
+                 if (domain in http_domain_list){
+                     debug(fmt("domain search end1: %s",current_time()));
+                     c$http$malicous_state = 1;
+                     NOTICE([$note=DOMAIN_MAL,
                                           $msg=fmt("malicious domain %s found", domain),
                                           $conn=c,
                                           $identifier=cat(c$id)]);                                   
-                                }
-                              }
-                          }
-                        }
-                        if (c$http$malicous_state == 0){
-                            debug(fmt("hostname1 search begin: %s",current_time()));
-                            if (value in http_hostname1_list){
-                                debug(fmt("hostname1 search end1: %s",current_time()));
-                                c$http$malicous_state = 1;
-                                NOTICE([$note=HOSTNAME_MAL,
+                  }
+                  debug(fmt("domain search end2: %s",current_time()));
+              }
+            }
+          }
+          if (c$http$malicous_state == 0){
+              debug(fmt("hostname1 search begin: %s",current_time()));
+              if (value in http_hostname1_list){
+                  debug(fmt("hostname1 search end1: %s",current_time()));
+                  c$http$malicous_state = 1;
+                  NOTICE([$note=HOSTNAME_MAL,
                                           $msg=fmt("malicious hostname %s found", value),
                                           $conn=c,
                                           $identifier=cat(c$id)]);
-                            }
-                            debug(fmt("hostname1 search end2: %s",current_time()));
-                        }
-                        if (c$http$malicous_state == 0){
-                            debug(fmt("hostname2 search begin: %s",current_time()));
-                            if (value in http_hostname2_list){
-                                debug(fmt("hostname2 search end1: %s",current_time()));
-                                c$http$malicous_state = 2;
-                            }
-                            debug(fmt("hostname2 search end2: %s",current_time()));
-                        }
-			break;
+              }
+              debug(fmt("hostname1 search end2: %s",current_time()));
+            }
+            if (c$http$malicous_state == 0){
+                debug(fmt("hostname2 search begin: %s",current_time()));
+                if (value in http_hostname2_list){
+                    debug(fmt("hostname2 search end1: %s",current_time()));
+                    c$http$malicous_state = 2;
+                }
+                debug(fmt("hostname2 search end2: %s",current_time()));
+            }
+            break;
 
-			case "REFERER":
-			break;
+          case "REFERER":
+            break;
 
-			case "X-FORWARDED-FOR":
-			break;
+          case "X-FORWARDED-FOR":
+            break;
 
-			case "USER-AGENT":
-			break;
-			}
-		}
-	}
+          case "USER-AGENT":
+            break;
+          }
+       }
+}
 
 type SqliteVal: record {
     url: string;
@@ -186,3 +187,28 @@ event http_message_done(c: connection, is_orig: bool, stat: http_message_stat)
         }
     }
 }
+
+
+event Notice::log_notice(rec: Notice::Info){
+    local src = "unknown";
+    if (rec?$src){
+        src = fmt("%s",rec$src);
+    }
+
+    local dst = "unknown";
+    if (rec?$dst){
+        dst = fmt("%s",rec$dst);
+    }
+    
+    local url = "unkown";
+    if (rec?$conn && rec$conn?$http){
+        url = HTTP::build_url(rec$conn$http);
+    }
+
+    local cmd = fmt("%s %s %s %s %s %s", sendincidentlog, incident_log_server, src, dst, url, rec$note);
+    debug("cmd : " + cmd);
+    system(cmd);
+
+}
+
+
