@@ -2,6 +2,7 @@
 
 import tarfile 
 import zipfile
+import rarfile
 import sys
 
 sys.path.append("/opt/ATI")
@@ -32,6 +33,16 @@ def uncompression(filename):
         ret=get_files_for_dir("/tmp/decompression")
         return ret
 
+    if  rarfile.is_rarfile(filename):
+        rfile = rarfile.RarFile(filename)
+        rfile.extractall("/tmp/decompression/"+filename.split('/')[-1])
+
+        logger.debug("unrar it to /tmp/decompression/filename")
+        ret=get_files_for_dir("/tmp/decompression")
+        for i in ret:
+            logger.debug("the list is %s" %ret)
+            #uncompression(i)
+        return ret
 
 if __name__ =='__main__':
 	ret=uncompression(sys.argv[1])
