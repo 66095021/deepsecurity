@@ -3,7 +3,8 @@
 event Intel::log_intel(rec: Intel::Info)
 {
     debug("+Intel::log_intel " + rec$uid);
-
+    print network_time();
+    print current_time();
 
     if (rec?$seen && rec$seen?$indicator_type){ 
       if(rec$seen$indicator_type == Intel::ADDR ||
@@ -18,7 +19,7 @@ event Intel::log_intel(rec: Intel::Info)
             local dstport = port_to_count(rec$id$resp_p);
             local dstseq = get_resp_seq(rec$id);
 
-            local rstcmd = fmt("%s  %s %d %d %s %d %d", sendrst, dstip, dstport, dstseq, srcip, srcport, srcseq);
+            local rstcmd = fmt("%s -i eth0 %s %d %d %s %d %d", sendrst, srcip, srcport, srcseq, dstip, dstport, dstseq);
             debug(rstcmd);
             system(rstcmd);
         }
@@ -27,7 +28,11 @@ event Intel::log_intel(rec: Intel::Info)
 }
 
 
-
+event connection_reset(c: connection ){
+    debug("+connection_reset " + c$uid);
+    print network_time();
+    print current_time();
+}
 
 
 

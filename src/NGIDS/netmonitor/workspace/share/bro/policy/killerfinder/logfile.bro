@@ -12,7 +12,6 @@ function extract_name_from_uri(uri : string) : string
     local i = strstr(uri, "://") ;
     if (i != 0){
       uri = sub_bytes(uri, i+3, |uri|-i-2);
-      print uri;
     }
 
 
@@ -56,6 +55,7 @@ redef record HTTP::Info += {
 event http_request(c: connection , method: string , original_URI: string , unescaped_URI: string , version: string )
 {
     debug("+http_request " + c$uid);
+    
     if ( !c$http?$current_header ){
         c$http$current_header = httphead($cnid=c$id,
                                         #$uri=original_URI,
@@ -122,6 +122,7 @@ redef record Files::Info += {
 #	["text/html"] = "html",
 #};
 
+
 function cared_type(f:fa_file):bool
 {
     
@@ -129,7 +130,7 @@ function cared_type(f:fa_file):bool
         return T;
     }
     
-    for(t in caredtypes){
+    for(t in file_caredtypes){
         if ( 0 != strstr(f$mime_type, t)){
             return T;
         }
@@ -137,15 +138,33 @@ function cared_type(f:fa_file):bool
     return F;
 
 }
+event intel_data(f: fa_file, data: string)
+{
+    #debug("+intel_data " + f$id);
+}
 
 event file_new(f:fa_file)
 {
     debug("+file_new "+f$id);
     
-    if (!cared_type(f)){
+    if ( ! cared_type(f) ){
         return;
     }
-
+	
+    # check protocol
+    if ( f?$source && f$source ! in file_caredprotocols){
+        debug(f$id + " not in cared protocols: " + f$source);
+        return;
+    }	
+	
+    # check src ip
+    for (id in f$conns){
+        if (id$orig_h in file_unwanted_src_ips){
+            debug(f$id + " in unwanted ip list");
+            return;
+        }
+    }
+    
 
     local fname = f$id;
     
@@ -156,12 +175,13 @@ event file_new(f:fa_file)
         }else{
             fname += ".unknown";
         }
-    }else{
+      }else{
         fname += ".unknown";
     }
 
     debug("create a file " + fname);
     Files::add_analyzer(f, Files::ANALYZER_EXTRACT, [$extract_filename=fname]);    
+    #Files::add_analyzer(f, Files::ANALYZER_DATA_EVENT, [$stream_event=intel_data]);
 }
 
 
@@ -212,10 +232,16 @@ event file_timeout(f: fa_file )
 
 event file_gap(f: fa_file , offset: count , len: count )
 {
-    debug("+file_gap "+f$id);
+    debug(fmt("+file_gap %s off %d len %d", f$id, offset, len));
 }
 
 
+event tcp_packet(c: connection , is_orig: bool , flags: string , seq: count , ack: count , len: count , payload: string )
+{
+    #if (!is_orig){
+        #debug(fmt("+tcp_packet %s seq %d, ack %d, len %d ",c$uid, seq, ack, len));
+    #}
+}
 
 
 ######################################
@@ -224,9 +250,71 @@ event file_gap(f: fa_file , offset: count , len: count )
 #
 ######################################
 
+function is_file_cared(rec: Files::Info):bool
+{
+    local hs = "";
+	if (rec?$tx_hosts){
+        for (h in rec$tx_hosts){
+            hs += fmt("%s ", h);
+        }
+	}
+	
+	local m = "";
+	if (rec?$mime_type){
+		m = rec$mime_type;
+	}
+    debug(rec$fuid + " mime " + m + " source " + rec$source + " ip " + hs);
+   
+    # check mime type
+    if ( ! rec?$mime_type ){
+        debug(rec$fuid + " no mime type, ignore it");
+        return F;
+    }
+    
+    local caredtype = F;
+    for(t in file_caredtypes){
+        if ( 0 != strstr(rec$mime_type, t) ){
+            caredtype = T;
+        }
+    }
+    if (!caredtype){
+        debug(rec$fuid + "not in cared type");
+        return F;
+    }
+
+    # check protocol
+    if (rec?$source){
+        debug(rec$fuid + " no source, ignore it");
+        return F;
+    } else if (rec$source ! in file_caredprotocols){
+        debug(rec$fuid + " not in cared protocols");
+        return F;
+    }
+
+    # check src ip
+    if (rec?$tx_hosts){
+        for (sender in rec$tx_hosts){
+            if (sender in file_unwanted_src_ips){
+                return F;
+            }
+        }
+    } else {
+        debug(rec$fuid + " no src ip, ignore it");
+        return F;
+    }
+
+    return T;
+}
+
 function split_log(id: Log::ID, path: string, rec: Files::Info) : string
 {
     return fmt("files-%s", rec$source);
+}
+
+function log_cared_file(rec: Files::Info): bool
+{
+    return T;
+    #return is_file_cared(rec);
 }
 
 event bro_init()
@@ -239,6 +327,7 @@ event bro_init()
     local filter: Log::Filter = [$name="fileinfo",
                                  $path="fileinfo",
                                  $path_func=split_log,
+                                 $pred=log_cared_file,
                                  $include=set("ts",
                                               "fuid",
                                               "conn_uids",
