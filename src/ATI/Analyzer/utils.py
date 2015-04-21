@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 
-logfile='/var/log/monitor.log'
+logfile='/var/ATI/virus-sophos.log'
 
 def log_virus(filename):
-    f=open(filename,'a+')
+    f=open(logfile,'a+')
     f.write('file %s is virus\n' %filename)
     f.close()
 
 
 def log_sig_ok(filename):
-    f=open(filename,'a+')
+    f=open(log_file,'a+')
     f.write('file %s signature is ok \n' %filename)
     f.close()
     

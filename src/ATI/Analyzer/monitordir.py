@@ -59,6 +59,8 @@ def filter_file(filename):
         ret=sophos_it(filename)
         if ret:
             log_virus(filename)
+            logger.debug("/opt/ATI/postersophosforensic.py "+ cloud_server + " " + filename  +" " +" 1.1.1.1 " +" 2.2.2.2" +"  www.test.com"+ "virus")
+            os.system("/opt/ATI/postersophosforensic.py "+ cloud_server + " " + filename  +" " +" 1.1.1.1 " +" 2.2.2.2" +"  www.test.com"+" "+  "virus")
             return
 #no virus, check the sig, 0 means sig check ok,  1 means no sig or sig cert is untrusted
         ret=verify_sig(filename)
