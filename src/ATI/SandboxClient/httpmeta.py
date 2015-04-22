@@ -12,6 +12,7 @@ from logger import *
 
 
 from analyzer_config import * 
+
 def get_line_contain_fuid(filename):
     if not os.path.exists(file_meta_info_dir):
         logger.debug("file meta file does NOT existt")
@@ -64,6 +65,30 @@ def get_real_name_from_fuid(filename):
     else:
         return filename.split('/')[-1]
 
+
+def get_ip_information(filename):
+    fuid=filename.split('/')[-1].split('.')[0]
+    f=open(file_meta_info_dir,'r')
+    for line in f:
+            d=json.JSONDecoder().decode(line)
+            if str(d["fuid"])==fuid:
+                f.close()
+                return  (str(d["details"][0]).split(',')[0].split('=')[-1], str(d["details"][0]).split(',')[2].split('=')[-1])
+    f.close()
+
+
+def get_url_information(filename):
+    fuid=filename.split('/')[-1].split('.')[0]
+    f=open(file_meta_info_dir,'r')
+    for line in f:
+            d=json.JSONDecoder().decode(line)
+            if str(d["fuid"])==fuid:
+                f.close()
+                return  d["desc"]
+    f.close()
+
 if __name__== "__main__":
     print get_line_contain_fuid(  sys.argv[1])
+    print get_ip_information(     sys.argv[1]  )
+    print get_url_information    ( sys.argv[1]  )
     #print get_real_name_from_fuid(sys.argv[1])
