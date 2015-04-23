@@ -18,12 +18,14 @@ export {
                                #"/usr/local/bro/db/example.db"
   #                            };  
  
+  global incident_log_server = "127.0.0.1";
   global httpip4db="/usr/local/bro/db/httpip4.db";
   global httpdomaindb="/usr/local/bro/db/httpdomain.db";
   global httphostname1db="/usr/local/bro/db/httphostname1.db";
   global httphostname2db="/usr/local/bro/db/httphostname2.db";
   global sqlitdb="/usr/local/bro/db/brodb";
   
+  global sendincidentlog = "/usr/local/bro/bin/posterincidenturl.py";
   global sendrst = "/usr/local/bro/bin/rst";
   global nofileslog = T;
   global debug_enabled = T;
