@@ -11,7 +11,10 @@ Note that currently, this is only write logs to disk.
 import time
 import os
 import shutil
+import sys
+sys.path.append("/opt/ThreatSphere")
 
+from logger import *
 from twisted.internet import reactor, protocol
 from twisted.protocols import basic
 
@@ -71,11 +74,13 @@ class CLogReceiver(basic.LineReceiver):
 	def createFD2Write(self):
 	
 		file	= self.log_folder + '/' + time.strftime('%Y-%m-%d_%H-%M', time.localtime(time.time()))
-
+                logger.debug("will create a new file to write %s" %(file))
+                logger.debug("the current file is %s"%(self.file2Write))
 		if (self.file2Write != file):
 			if (self.fd2Write != None):
 				self.fd2Write.close()
 				self.fd2Write	= None
+                                logger.debug("the two file is diff")
 
 			if os.path.exists(self.file2Write):
 				i	= self.file2Write.rfind("/")
@@ -89,6 +94,8 @@ class CLogReceiver(basic.LineReceiver):
 
 		if (self.fd2Write is None):
 			self.fd2Write	= open(file, 'a')	
+                        logger.debug("using the new file to write")
+                logger.debug("the new file is the same with old file,so keep write it")
 		
 	def revisitFD2Write(self):
 		if (self.c <= 0):
