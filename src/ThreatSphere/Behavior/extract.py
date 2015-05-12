@@ -60,6 +60,9 @@ from dirutil import *
 def get_meta_of_line(line):
     meta={}
     logger.debug("the original line is %s" %line)
+    if line.find("<") == -1 or line.find("/>") == -1:
+        logger.debug("the line is not pretty, ignore it")
+        return None
     line=line.replace("<system-event ","")
     line=line.replace("/>","")
     line=line.replace(" ","-",1)
@@ -81,6 +84,8 @@ extract_list=[]
 def get_pid_action(line):
     global extract_list
     meta=get_meta_of_line(line)
+    if meta == None: 
+        return
     pid=meta["processId"]
     pname=meta["process"]
     #logger.debug ("%s %s %s" %(pname, pid,meta))
