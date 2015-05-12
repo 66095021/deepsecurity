@@ -109,6 +109,13 @@ def get_pid_action(line):
        return
     # stop by the sbx, we can set the status to be done at this point,and send the information to queue
     if pname.find("CaptureClient.exe") != -1 and meta["type"] == "process" and meta["action"]=="terminated":
+       for i in extract_list:
+           if i["processId"] == meta["object1"]:
+               i["status"]="done"
+               i["stop_time"]=meta["time"]
+               i["stop_utc_time"]=meta["utc_time"]
+               logger.debug("the PID %s is terminated" %(i["processId"]))
+               break
        return
 
 def get_pid_info_from_file(file):
@@ -138,6 +145,7 @@ def run_loop(dir):
                 filedone.append(i)
             else:
                 logger.debug( "it is in the done list now")
+                logger.debug( "the extract_list %s" %(extract_list))
                  #print i
         time.sleep(1)
 
