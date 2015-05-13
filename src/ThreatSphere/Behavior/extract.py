@@ -54,6 +54,7 @@ pid_list={}
 #
 #it will return dict of a line 
 import time
+import json
 import sys
 from logger import * 
 from dirutil import * 
@@ -117,7 +118,15 @@ def get_pid_action(line):
                logger.debug("the PID %s is terminated" %(i["processId"]))
                break
        return
-
+   # no sbx, it is a monitor pid action, then update it into extract_list element about the pid
+    for i in extract_list:
+        if i["processId"]==meta["processId"]:
+        # if no information, it is a new monitor pid without any type/action info, so make a list to store    
+            if "information" not in i.keys():
+                i["information"]=[]
+        # has now, so store the meta into it
+            i["information"].append(meta)   
+      
 def get_pid_info_from_file(file):
     f=open(file,'r')
     logger.debug("now extract information from file %s" %(file))
@@ -146,6 +155,9 @@ def run_loop(dir):
             else:
                 logger.debug( "it is in the done list now")
                 logger.debug( "the extract_list %s" %(extract_list))
+                f=open('/tmp/xxx','w')
+                json.dump(extract_list,f)
+                f.close()
                  #print i
         time.sleep(1)
 
