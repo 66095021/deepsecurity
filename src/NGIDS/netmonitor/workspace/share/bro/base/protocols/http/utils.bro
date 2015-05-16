@@ -71,7 +71,7 @@ function build_url(rec: Info): string
                 }
 	local host = rec?$host ? rec$host : addr_to_uri(rec$id$resp_h);
 	if ( rec$id$resp_p != 80/tcp )
-		host = fmt("%s:%s", host, rec$id$resp_p);
+		host = fmt("%s:%d", host,port_to_count(rec$id$resp_p));
 	return fmt("%s%s", host, uri);
 	}
 	
