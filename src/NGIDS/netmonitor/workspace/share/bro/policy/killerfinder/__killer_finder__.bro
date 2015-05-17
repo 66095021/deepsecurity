@@ -61,6 +61,8 @@ export {
 @load killerfinder/logfile
 #@load killerfinder/blockkiller
 @load killerfinder/incident_log
+@load killerfinder/redirect       
+@load killerfinder/no_referer
 
 
 event bro_init()
