@@ -58,6 +58,7 @@ import json
 import sys
 from logger import * 
 from dirutil import * 
+from networkinfo import *
 def get_meta_of_line(line):
     meta={}
     logger.debug("the original line is %s" %line)
@@ -126,6 +127,8 @@ def get_pid_action(line):
                 i["information"]=[]
         # has now, so store the meta into it
             i["information"].append(meta)   
+        # update network information
+            get_network_information(meta,i)
       
 def get_pid_info_from_file(file):
     f=open(file,'r')
