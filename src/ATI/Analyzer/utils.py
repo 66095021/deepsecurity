@@ -9,7 +9,7 @@ def log_virus(filename):
 
 
 def log_sig_ok(filename):
-    f=open(log_file,'a+')
+    f=open(logfile,'a+')
     f.write('file %s signature is ok \n' %filename)
     f.close()
     
