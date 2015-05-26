@@ -7,6 +7,9 @@ export {
 
 
   redef interfaces += "lo";
+  redef interfaces += "wlan0";
+  redef PacketFilter::default_capture_filter = "tcp or udp";
+
   redef LogAscii::use_json = T;
  #redef FileExtract::prefix = "/tmp/brofiles/";
  #redef Intel::read_files += { 
@@ -63,7 +66,9 @@ export {
 @load killerfinder/incident_log
 @load killerfinder/redirect       
 @load killerfinder/no_referer
-
+@load killerfinder/vulware
+@load killerfinder/mal_smtp_orig
+@load killerfinder/detect_mal_file
 
 event bro_init()
 {
