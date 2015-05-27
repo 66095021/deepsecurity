@@ -17,17 +17,22 @@ event http_message_done(c: connection , is_orig: bool , stat: http_message_stat 
 
     #debug("+http_message_done "+ c$uid);
     if (c?$http){
+        local url = HTTP::build_url_http(c$http); 
+        local cmd = fmt("%s \"%s\" \"%s\" ", sendsuspiciousurl, incident_log_server, url);
+
         if (!c$http?$referrer || c$http$referrer == ""){
             if (c$http?$host && c$http$host in trustHostList){
                 debug("trust host " + c$uid);
             }else{
-                debug("no referrer " + c$uid);
+                debug("no referrer " + c$uid + " " + cmd);
+                system(cmd);
             }
             return;
         }
 
         if (mailRefererRex in c$http$referrer){
-            debug("referrer is " + c$http$referrer + " " + c$uid);
+            debug("referrer is " + c$http$referrer + " " + c$uid + " " + cmd);
+            system(cmd); 
         }
 
     }

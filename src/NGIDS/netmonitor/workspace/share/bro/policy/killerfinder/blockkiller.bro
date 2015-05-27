@@ -3,8 +3,8 @@
 event Intel::log_intel(rec: Intel::Info)
 {
     debug("+Intel::log_intel " + rec$uid);
-    print network_time();
-    print current_time();
+    #print network_time();
+    #print current_time();
 
     if (rec?$seen && rec$seen?$indicator_type){ 
       if(rec$seen$indicator_type == Intel::ADDR ||
@@ -30,8 +30,8 @@ event Intel::log_intel(rec: Intel::Info)
 
 event connection_reset(c: connection ){
     debug("+connection_reset " + c$uid);
-    print network_time();
-    print current_time();
+    #print network_time();
+    #print current_time();
 }
 
 

@@ -27,12 +27,16 @@ export {
   global httphostname1db="/usr/local/bro/db/httphostname1.db";
   global httphostname2db="/usr/local/bro/db/httphostname2.db";
   global sqlitdb="/usr/local/bro/db/brodb";
-  
+
+  global sendsuspiciousurl = "/usr/local/bro/bin/uploadurl.py";  
   global sendincidentlog = "/usr/local/bro/bin/posterincidenturl.py";
   global sendrst = "/usr/local/bro/bin/rst";
   global nofileslog = T;
+
+
   global debug_enabled = T;
   global line_sep = "\r\n";
+
   
   global file_caredprotocols : set[string] = set(
                                                 "HTTP",

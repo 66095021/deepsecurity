@@ -43,6 +43,11 @@ event http_message_done(c: connection , is_orig: bool , stat: http_message_stat 
             debug("url hit the last one");
             if (!c$http?$location){
                 debug("redirection loop end. ");
+                if (|v| > 2){
+                    local cmd = fmt("%s \"%s\" \"%s\" ", sendsuspiciousurl, incident_log_server, v[1]);
+                    debug(cmd);
+                    system(cmd);
+                }
                 for (i in v){
                     debug("  " + v[i]);
                 }
