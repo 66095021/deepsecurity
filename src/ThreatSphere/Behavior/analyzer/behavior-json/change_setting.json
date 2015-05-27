@@ -1,0 +1,39 @@
+{
+    "iob": {
+        "@last-modified": "2015-05-26T07:59:17",
+        "authored_by": "ghchen",
+        "authored_date": "2015-05-26T07:34:24",
+        "definition": {
+            "Indicator": {
+                "@operator": "OR",
+                "IndicatorItem": [
+                    {
+                        "@condition": "regex_i",
+                        "Content": {
+                            "#text": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+                            "@type": "string"
+                        },
+                        "Context": {
+                            "@document": "RegistryItem",
+                            "@search": "RegistryItem\\SetRegistry\\Key"
+                        }
+                    },
+                    {
+                        "@condition": "is",
+                        "Content": {
+                            "#text": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Security Center\\AntiVirusDisableNotify",
+                            "@type": "string"
+                        },
+                        "Context": {
+                            "@document": "RegistryItem",
+                            "@search": "RegistryItem\\SetRegistry\\Key"
+                        }
+                    }
+                ]
+            }
+        },
+        "description": "Indicator of change system settings",
+        "links": null,
+        "short_description": "SystemSettings"
+    }
+}

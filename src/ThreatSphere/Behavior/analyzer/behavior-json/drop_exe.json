@@ -1,0 +1,39 @@
+{
+    "iob": {
+        "@last-modified": "2015-05-26T07:59:17",
+        "authored_by": "ghchen",
+        "authored_date": "2015-05-26T07:34:24",
+        "definition": {
+            "Indicator": {
+                "@operator": "AND",
+                "IndicatorItem": [
+                    {
+                        "@condition": "regex_i",
+                        "Content": {
+                            "#text": "C:\\\\Windows\\\\System32\\\\",
+                            "@type": "string"
+                        },
+                        "Context": {
+                            "@document": "FileItem",
+                            "@search": "FileItem\\CreateFile\\FilePath"
+                        }
+                    },
+                    {
+                        "@condition": "cross_match_i",
+                        "Content": {
+                            "#text": "FileItem\\CreateFile\\FilePath",
+                            "@type": "search_ref"
+                        },
+                        "Context": {
+                            "@document": "ProcessItem",
+                            "@search": "ProcessItem\\CreateProcess\\ImagePath"
+                        }
+                    }
+                ]
+            }
+        },
+        "description": "The sample drops and runs executable files in a Windows system folder",
+        "links": null,
+        "short_description": "SystemSettings"
+    }
+}
