@@ -187,17 +187,23 @@ def run_loop(dir):
                 filedone.append(i)
             else:
                 logger.debug( "it is in the done list now")
-                logger.debug( "the extract_list %s" %(extract_list))
-                f=open('/tmp/xxx','w')
-                json.dump(extract_list,f)
-                f.close()
+                #logger.debug( "the extract_list %s" %(extract_list))
+                #f=open('/tmp/xxx','w')
+                #json.dump(extract_list,f)
+                #f.close()
                  #print i
         time.sleep(1)
 
 
 def  analysis_it():
     for i in extract_list:
-        get_process_behavior_list(i)
+        (name,ret)=get_process_behavior_list(i)
+        i["behavior_name_list"]=name
+        i["behavior_result"]=ret
+        print i
+        f=open('/tmp/xxx','w')
+        json.dump(extract_list,f)
+        f.close()
 
 class MyThread(threading.Thread):
      def __init__(self):  
@@ -213,7 +219,7 @@ class MyThread2(threading.Thread):
         #self.num = num
      def run(self):
          while True:
-             time.sleep(22)
+             time.sleep(10)
              print "I am two thread,222"  
              analysis_it()
 

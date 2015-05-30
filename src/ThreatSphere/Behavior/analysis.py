@@ -90,6 +90,9 @@ def match_rule(item, process_info):
 	match_action=action_map[act.split('\\')[1]]
 	match_property= act.split('\\')[2]
 	logger.debug("in match_rule function, the match information is type %s, action %s, property %s" %(match_type,match_action,match_property))
+# some process do nothing, so no information 
+        if "information" not in process_info.keys():
+            return 0
 	for   i    in  process_info["information"]:
 		if  i["type"] ==match_type and i["action"] == match_action :
 			logger.debug( "we found  a type/action line %s,will calculate the rule,the match_type is %s, match_action is %s , match_property is %s , content is %s " %(i,match_type,match_action,match_property,content))
@@ -181,6 +184,6 @@ def get_process_behavior_list(process_info):
 		ret.append(foo)
 	print  "behavior name list  %s" %(name)
 	print  "behavior result %s"%(ret)
-	return ret
+	return (name,ret)
 
 
