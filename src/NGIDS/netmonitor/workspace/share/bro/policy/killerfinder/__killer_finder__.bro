@@ -10,6 +10,10 @@ export {
   redef interfaces += "wlan0";
   redef PacketFilter::default_capture_filter = "tcp or udp";
 
+  redef record HTTP::Info += {
+    disposition: string &log &optional;
+  };
+
   redef LogAscii::use_json = T;
  #redef FileExtract::prefix = "/tmp/brofiles/";
  #redef Intel::read_files += { 
@@ -32,6 +36,7 @@ export {
   global sendincidentlog = "/usr/local/bro/bin/posterincidenturl.py";
   global sendrst = "/usr/local/bro/bin/rst";
   global nofileslog = T;
+
 
 
   global debug_enabled = T;
@@ -59,6 +64,18 @@ export {
   global file_unwanted_src_ips : set[addr] = set(
                                           10.228.34.168
                                           ); 
+
+  global trustHostList: set[string] = {
+     "www.baidu.com",
+     "www.sina.com",
+     "www.163.com"
+  };
+
+  global mailRefererRex = /mail.sina.com.cn/ |
+                          /mail.163.com/;
+
+
+
   
 }
 

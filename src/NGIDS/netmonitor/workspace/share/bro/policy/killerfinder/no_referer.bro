@@ -3,15 +3,6 @@ redef enum Notice::Type += {
     URL_FROM_EMAIL,
 };
 
-global trustHostList: set[string] = {
-     "www.baidu.com",
-     "www.sina.com",
-     "www.163.com"
-};
-
-global mailRefererRex = /mail.sina.com.cn/ |
-                        /mail.163.com/;
-
 
 event http_message_done(c: connection , is_orig: bool , stat: http_message_stat )
 {
@@ -30,6 +21,7 @@ event http_message_done(c: connection , is_orig: bool , stat: http_message_stat 
             }else{
                 #debug("no referrer " + c$uid + " " + cmd);
                 #system(cmd);
+                c$http$disposition = "1";
                 NOTICE([$note=NO_REFERER,$msg=url, $sub="http request without referer", $conn=c, $identifier=cat(c$id)]);
             }
             return;
@@ -38,6 +30,7 @@ event http_message_done(c: connection , is_orig: bool , stat: http_message_stat 
         if (mailRefererRex in c$http$referrer){
             #debug("referrer is " + c$http$referrer + " " + c$uid + " " + cmd);
             #system(cmd); 
+            c$http$disposition = "1";
             NOTICE([$note=URL_FROM_EMAIL,$msg=url, $sub="http request from email", $conn=c, $identifier=cat(c$id)]);
         }
 

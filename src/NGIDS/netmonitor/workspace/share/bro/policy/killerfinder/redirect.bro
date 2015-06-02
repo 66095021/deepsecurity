@@ -50,6 +50,7 @@ event http_message_done(c: connection , is_orig: bool , stat: http_message_stat 
                     #local cmd = fmt("%s \"%s\" \"%s\" ", sendsuspiciousurl, incident_log_server, v[1]);
                     #debug(cmd);
                     #system(cmd);
+                    c$http$disposition = "1";
                     NOTICE([$note=URL_REDIRECT,$msg=v[1], $sub="url redirect more than 2 times", $conn=c, $identifier=cat(c$id)]);
                 }
                 for (i in v){
