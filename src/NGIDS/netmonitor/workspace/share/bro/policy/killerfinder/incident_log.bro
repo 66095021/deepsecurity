@@ -29,10 +29,10 @@ type http_mal_state: enum {
    HOSTNAME1_HIT,
    HOSTNAME2_HIT,
    URL_HIT,  
-};
+} &redef;
 
 redef record HTTP::Info += {
-    malicous_state : http_mal_state  &default = MAL_NONE;
+    malicous_state : http_mal_state  &log &default = MAL_NONE;
 };
 
 global http_ip4_list: table[addr] of Val = table();
