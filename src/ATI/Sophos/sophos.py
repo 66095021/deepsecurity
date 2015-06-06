@@ -38,8 +38,26 @@ def sophos_it(filename):
             logger.debug("this line does NOT match,continue");
     f.close()
     return ret
+
+#get the virus name if the filename is scanned as virus 
+def sophos_virus_name(filename):
+#use hashvalue to match 
+    f=open('/tmp/sophos_out','r')
+    hashvalue=get_sha1sum(filename)
+    for line in f:
+        logger.debug( "iterate the sophos_out %s to find the virus name result " %line)
+        #print    type(line)
+        if line.split(" ")[1].strip()== hashvalue:
+            ret=(line.split(" ")[3].strip())
+            logger.debug ("Now, we match the result %s  the virus name is %s\n" %(line,ret))
+            break
+        else:
+            logger.debug("this line does NOT match,continue");
+    f.close()
+    return ret
 if __name__== '__main__':
     print sophos_it("/tmp/7za.exe")
     print sophos_it("/root/sophos-av/ADVENT.COM")
+    print sophos_virus_name("/tmp/ADVENT.COM")
 
     

@@ -46,7 +46,19 @@ def log_debug(msg):
     f=open(log_file,'a+')
     f.write(msg)
     f.close()
+# log ATI.log about every files   about following info 
+#{local_name real_name url client_ip dst_ip sophos_result  filetype dispositon signature size}
 def filter_file(filename):
+    info={}
+    info["local_name"]=filename
+    info["real_name"]=get_real_name_from_fuid(filename)
+    info["url"]=get_url_information(filename)
+    (src,dest)=get_ip_information(filename)
+    info["client_ip"]=src
+    info["dst_ip"]=dest 
+    info["filetype"]=getfiletype(filename)
+    info["size"]=get_file_size(filename)
+ 
     if  get_file_size(filename) == -1 or get_file_size(filename) > file_size_max:
         logger.debug("the file does NOT exist or the file size is above the max, did NOT filter it")
         return  
@@ -59,18 +71,27 @@ def filter_file(filename):
         ret=sophos_it(filename)
         if ret:
             log_virus(filename)
+            virus=sophos_virus_name(filename)
+            #record it in the log  , send to forensic server and return
+            info["sophos_result"] = virus
             (src,dest)=get_ip_information(filename)
             url=get_url_information(filename)
+            logger1.debug(json.dumps(info))
             os.system("/opt/ATI/postersophosforensic.py "+ cloud_server + " " + filename  +" " +src  +" " +dest +" "+url + " "+  "virus")
             logger.debug("/opt/ATI/postersophosforensic.py "+ cloud_server + " " + filename  +" " +src  +" " +dest +" "+url + " "+  "virus")
             return
+        info["sophos_result"] = "clean"
 #no virus, check the sig, 0 means sig check ok,  1 means no sig or sig cert is untrusted
         ret=verify_sig(filename)
         if ret == 0:
             log_sig_ok(filename)
+            info["signature"] = "ok"
+            logger1.debug(json.dumps(info))
             return
         else:
             send_file_to_clound_from_agent(filename)
+            info["disposition"]="yes"
+            logger1.debug(json.dumps(info))
             return
 # uncompression should return a tuple contains the uncompression file list.
     if is_compression(filetype):
