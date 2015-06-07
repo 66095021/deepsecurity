@@ -15,7 +15,14 @@ def check_root():
 def upload_file():
     return ["what? uploadfile"]
 
-
+# return ip from string of meta  of self.environ
+def get_ip_info(d):
+#make it to dict
+    j=json.JSONDecoder().decode(d)
+    logger.debug(j)
+    logger.debug(type(j["details"]))
+    logger.debug(j["details"])
+    return(j["ts"], str(j["details"][0]).split(',')[0].split('=')[-1], str(j["details"][0]).split(',')[2].split('=')[-1])
 
 class application:
     def __init__(self, environ, start_response):
@@ -61,6 +68,14 @@ class application:
                 jobinfo['url']=self.environ["HTTP_URL"]   
                 jobinfo['job_type']='url'
                 add_info(jobkey, jobinfo)
+                #need more info from sniffer !!!!
+                #(ts,src,dst)=get_ip_info(self.environ["HTTP_META"])
+                info_dict={"url": self.environ["HTTP_URL"], 
+		 #  "client_ip":   src,
+		 #  "dst_ip" :dst  ,
+		 #  "ts" : ts             
+                }
+                logger1.debug(info_dict)
                 return self.GET_index()
         else:
             return self.notfound()
@@ -91,7 +106,7 @@ class application:
 	f = open('/var/ThreatSphere/uploadfiles/'+filename, 'w')
 	body=self.environ['wsgi.input'].read(request_body_size)
 	f.write(body)
-	f.close
+	f.close()
         # we also write the meta into file, so that we can match information later
         tmp_dict={"filename": self.environ["HTTP_FILENAME"], 
                   "x-files":  self.environ["HTTP_X_FILES"],
@@ -104,5 +119,13 @@ class application:
         f.write(k)
         f.write('\n')
         f.close()
+        (ts,src,dst)=get_ip_info(self.environ["HTTP_META"])
+        info_dict={"filename": self.environ["HTTP_FILENAME"], 
+                   "sha1sum": self.environ["HTTP_SHA1SUM"],
+		   "client_ip":   src,
+		   "dst_ip" :dst  ,
+		   "ts" : ts             
+     }
+        logger1.debug(info_dict)
 	yield self.environ["REQUEST_METHOD"]+self.environ["PATH_INFO"]
         
