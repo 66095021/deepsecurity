@@ -13,7 +13,8 @@
 
 import logging  
 import logging.handlers  
-import json 
+import json
+import os
 LOG_FILE = '/var/log/sbx.log'  
 LOG_FILE_ATI = '/opt/ThreatSphere/logs/ThreatSphere.log'   
 LOG_FILE_ATI_DIR='/opt/ThreatSphere/logs'
