@@ -15,7 +15,10 @@ import logging
 import logging.handlers  
 import json 
 LOG_FILE = '/var/log/sbx.log'  
-LOG_FILE_ATI = '/var/log/ThreatSphere.log'   
+LOG_FILE_ATI = '/opt/ThreatSphere/logs/ThreatSphere.log'   
+LOG_FILE_ATI_DIR='/opt/ThreatSphere/logs'
+if not os.path.exists(LOG_FILE_ATI_DIR):
+    os.system("mkdir %s" %(LOG_FILE_ATI_DIR)
 handler = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes = 1024*1024, backupCount = 5) # ...handler    
 handler_ATI = logging.handlers.RotatingFileHandler(LOG_FILE_ATI, maxBytes = 1024*1024, backupCount = 5) # ...handler    
 fmt = '%(asctime)s - %(filename)s:%(lineno)s - %(name)s - %(message)s'  

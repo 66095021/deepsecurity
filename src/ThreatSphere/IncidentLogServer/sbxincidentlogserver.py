@@ -26,8 +26,8 @@ class application:
     def __iter__(self):
         path = self.environ['PATH_INFO']
          
-        os.system("mkdir -p  /var/forensic/file_repos")
-        os.system("mkdir -p  /var/incident")
+        os.system("mkdir -p  /opt/ThreatSphere/forensic/file_repos")
+        os.system("mkdir -p  /opt/ThreatSphere/incident")
         
         print self.environ
         #log or forensic is diffed by  information_type in POST header, information is JSON in the body
@@ -69,18 +69,18 @@ class application:
         self.start('200 OK', [('Content-Type','text/html')])
 	len=self.environ['CONTENT_LENGTH']
 	request_body_size=int(len)
-	f = open('/var/forensic/'+filename, 'a')
+	f = open('/opt/ThreatSphere/forensic/'+filename, 'a')
 	body=self.environ['wsgi.input'].read(request_body_size)
 	f.write(body)
         f.write('\n')
 	f.close
 	yield self.environ["REQUEST_METHOD"]+self.environ["PATH_INFO"]
-     # for forensic, 1) save the JSON to json_data 2)extract the file to /var/forensic/file_repos/ timely   
+     # for forensic, 1) save the JSON to json_data 2)extract the file to /opt/ThreatSphere/forensic/file_repos/ timely   
     def save_forensic_data(self):
         self.start('200 OK', [('Content-Type','text/html')])
 	len=self.environ['CONTENT_LENGTH']
 	request_body_size=int(len)
-	f = open('/var/forensic/'+"json_data", 'a')
+	f = open('/opt/ThreatSphere/forensic/'+"json_data", 'a')
 	body=self.environ['wsgi.input'].read(request_body_size)
 	f.write(body)
         f.write('\n')
@@ -89,19 +89,19 @@ class application:
         decode_content=json.JSONDecoder().decode(body)
         #kick off the u char
         filename=str(decode_content["name"])
-        a=open("/var/forensic/file_repos/"+filename, "w")
+        a=open("/opt/ThreatSphere/forensic/file_repos/"+filename, "w")
         #file content is base64 encode in JSON body section, so decode it 
         filebody=base64.b64decode(decode_content["body"])
         a.write(filebody)
         a.close()
 	yield self.environ["REQUEST_METHOD"]+self.environ["PATH_INFO"]
 
-    #for incident log, just save it to log file /var/incident/json_data
+    #for incident log, just save it to log file /opt/ThreatSphere/incident/json_data
     def save_incident_log(self):
         self.start('200 OK', [('Content-Type','text/html')])
 	len=self.environ['CONTENT_LENGTH']
 	request_body_size=int(len)
-	f = open('/var/incident/json_data', 'a')
+	f = open('/opt/ThreatSphere/incident/json_data', 'a')
 	body=self.environ['wsgi.input'].read(request_body_size)
 	f.write(body)
         f.write('\n')
