@@ -1,0 +1,108 @@
+{
+    "Behaviour": {
+        "@description": "The sample makes suspicious changes onto system 001.",
+        "@name": "Changes_System_Settings",
+        "Indicator": {
+            "@operator": "++",
+            "IndicatorItem": [
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample drops 'autorun.inf', which is often used by malware",
+                    "Content": {
+                        "#text": "autorun.inf",
+                        "@type": "string"
+                    },
+                    "Context": {
+                        "@document": "FileItem",
+                        "@search": "FileItem\\WriteFile\\FilePath"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample modifies the win.ini file",
+                    "Content": {
+                        "#text": "%SystemRoot%\\win.ini",
+                        "@type": "string"
+                    },
+                    "Context": {
+                        "@document": "FileItem",
+                        "@search": "FileItem\\WriteFile\\FilePath"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample modifies the system.ini file",
+                    "Content": {
+                        "#text": "%SystemRoot%\\system.ini",
+                        "@type": "string"
+                    },
+                    "Context": {
+                        "@document": "FileItem",
+                        "@search": "FileItem\\WriteFile\\FilePath"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample adds a task to the Windows Task Scheduler",
+                    "Content": {
+                        "#text": "%SystemRoot%\\Tasks\\",
+                        "@type": "string"
+                    },
+                    "Context": {
+                        "@document": "FileItem",
+                        "@search": "FileItem\\WriteFile\\FilePath"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample writes to the file system in the Windows system folder",
+                    "Content": {
+                        "#text": "%SystemRoot%",
+                        "@type": "string"
+                    },
+                    "Context": {
+                        "@document": "FileItem",
+                        "@search": "FileItem\\WriteFile\\FilePath"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample modify the registry to lock the registry or taskmgr",
+                    "Content": {
+                        "#text": "\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+                        "@type": "string"
+                    },
+                    "Context": {
+                        "@document": "RegistryItem",
+                        "@search": "RegistryItem\\SetRegistry\\Key"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample ",
+                    "Content": {
+                        "@type": "array",
+                        "Item": [
+                            {
+                                "#text": "%SystemRoot%\\system32\\reg.exe",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "%SystemRoot%\\system32\\cscript.exe",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "%SystemRoot%\\system32\\regsvr32.exe",
+                                "@type": "string"
+                            }
+                        ]
+                    },
+                    "Context": {
+                        "@document": "ProcessItem",
+                        "@search": "ProcessItem\\CreateProcess\\FilePath"
+                    }
+                }
+            ]
+        }
+    }
+}

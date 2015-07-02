@@ -1,0 +1,302 @@
+{
+    "Behaviour": {
+        "@description": "sample of auto run shared common between systems",
+        "@name": "AutoRun",
+        "Indicator": {
+            "@mode": "0",
+            "@operator": "OR",
+            "IndicatorItem": [
+                {
+                    "@condition": "regex_i",
+                    "@description": "process autorun.inf start",
+                    "Content": {
+                        "#text": "autorun.inf",
+                        "@type": "string"
+                    },
+                    "Context": {
+                        "@document": "ProcessItem",
+                        "@search": "ProcessItem\\CreateProcess\\FileName"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "write file to auto start folders",
+                    "Content": {
+                        "@type": "array",
+                        "Item": [
+                            {
+                                "#text": "%appdata%\\Microsoft\\Windows\\Start Menu\\Programs\\Startup",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "%ProgramData%\\Microsoft\\Windows\\Start Menu\\Programs\\Startup",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "C:\\windows\\Explorer.exe",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "C:\\Explorer.exe",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "%WindDir%\\Tasks Folder",
+                                "@type": "String"
+                            }
+                        ]
+                    },
+                    "Context": {
+                        "@document": "FileItem",
+                        "@search": "FileItem\\WriteFile\\FilePath"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "add or modify a registry key to control auto start",
+                    "Content": {
+                        "@type": "array",
+                        "Item": [
+                            {
+                                "#text": "HKEY_CURRENT_USERS\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders\\Startup",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_CURRENT_USERS\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Users Shell",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders\\Common Startup",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\run",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\load",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\system",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\software\\wow6432node\\microsoft\\windows\\currentversion\\run",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnceEx",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Terminal Server\\Install\\Software\\Microsoft\\Windows\\CurrentVersion\\Runonce",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Terminal Server\\Install\\Software\\Microsoft\\Windows\\CurrentVersion\\RunonceEx",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Terminal Server\\Install\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Session Manager",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_CLASSES_ROOT\\*\\shell\\*\\command",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "\\Software\\Microsoft\\Active Setup\\Installed Components",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce\\Setup",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\SharedTaskScheduler",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\policies\\Explorer\\Run",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_CLASSES_ROOT\\PROTOCOLS\\Filter",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_CLASSES_ROOT\\PROTOCOLS\\Handler",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\YSTEM\\CurrentControlSet\\Services\\WinSock2\\Parameters\\Protocol_Catalog9\\Catalog_Entries",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\WOW",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_CURRENT_USER\\Control Panel\\Desktop",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "\\Software\\Microsoft\\Command Processor",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows\\System\\Scripts",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Group Policy\\Scripts",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Browser Helper Objects",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "\\Software\\Microsoft\\Internet Explorer\\",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_CLASSES_ROOT\\*\\shellex\\ContextMenuHandlers\\",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_CURRENT_USER\\Software\\Classes\\*\\ShellEx\\ContextMenuHandlers",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_CURRENT_USER\\Software\\Classes\\Directory\\Background\\ShellEx\\ContextMenuHandlers",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_CLASSES_ROOT\\*\\shellex\\copyHookHandlers",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_CLASSES_ROOT\\*\\shellex\\DragDropHandlers",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_CLASSES_ROOT\\*\\shellex\\PropertySheetHandlers",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_CLASSES_ROOT\\*\\shellex\\ColumnHandlers",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\explorer\\ShellExecuteHooks",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Accessibility\\Utility Manager\\Magnifier",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Accessibility\\Configuration",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\SafeBoot\\Option",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\SecurityProviders",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Print\\Monitors",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AeDebug",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellIconOverlayIdentifiers",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Drivers32",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\BootVerificationProgram",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\MyComputer\\BackupPath",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\MyComputer\\ChkDskPath",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\MyComputer\\cleanuppath",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\MyComputer\\DefragPath",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Authentication\\Credential Provider Filters",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Authentication\\Credential Providers",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers\\Handlers",
+                                "@type": "String"
+                            },
+                            {
+                                "#text": "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\ServiceControlManagerExtension",
+                                "@type": "String"
+                            }
+                        ]
+                    },
+                    "Context": {
+                        "@document": "RegistryItem",
+                        "@search": "Registry\\SetRegistry\\Key"
+                    }
+                }
+            ]
+        }
+    }
+}

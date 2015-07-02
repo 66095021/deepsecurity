@@ -1,0 +1,211 @@
+{
+    "Behaviour": {
+        "@name": "Anti_VM_VBox_Device",
+	"@description": "test VM",
+        "Indicator": {
+            "@operator": "OR",
+            "IndicatorItem": [
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample checks host system files to detect whether it is on an Oracle VirtualBox",
+                    "Content": {
+                        "@type": "array",
+                        "Item": [
+                            {
+                                "#text": "\\Device\\VBoxGuest",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\Device\\VBoxMouse",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\Device\\VBoxVideo",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\.\\VBoxMiniRdrDN",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\.\\pipe\\VBoxMiniRdDN",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\.\\VBoxTrayIPC",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\.\\pipe\\VBoxTrayIPC",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "VBoxTrayIPC",
+                                "@type": "string"
+                            },
+                            {
+                                "@type": "string"
+                            }
+                        ]
+                    },
+                    "Context": {
+                        "@document": "FileItem",
+                        "@search": "FileItem\\ReadFile\\FilePath"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample checks files in the environment to detect whether it is on an Oracle VirtualBox",
+                    "Content": {
+                        "@type": "array",
+                        "Item": [
+                            {
+                                "#text": "VBoxDisp.dll",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "VBoxHook.dll",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "VBoxMRXNP.dll",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "VBoxOGL.dll",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "VBoxOGLarrayspu.dll",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "VBoxOGLcrutil.dll",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "VBoxOGLerrorspu.dll",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "VBoxOGLfeedbackspu.dll",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "VBoxOGLpackspu.dll",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "VBoxOGLpassthroughspu.dll",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "VBoxSF.sys",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "VBoxControl.exe",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "VBoxService.exe",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "VBoxTray.exe",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "VBoxDrvInst.exe",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "VBoxWHQLFake.exe",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "VBoxGuest.",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "VBoxMouse.",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "VBoxVideo.",
+                                "@type": "string"
+                            },
+                            {
+                                "@type": "string"
+                            }
+                        ]
+                    },
+                    "Context": {
+                        "@document": "FileItem",
+                        "@search": "FileItem\\ReadFile\\FileName"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample queries information in the registry to detect whether it is running in an Oracle VirtualBox",
+                    "Content": {
+                        "#text": "\\SOFTWARE\\Oracle\\VirtualBox Guest Additions",
+                        "@type": "string"
+                    },
+                    "Context": {
+                        "@document": "RegistryItem",
+                        "@search": "RegistryItem\\QueryRegistry\\Key"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample queries BIOS information in the registry to detect whether it is running inside VMware",
+                    "Content": {
+                        "#text": "\\HARDWARE\\DESCRIPTION\\System",
+                        "@type": "string"
+                    },
+                    "Context": {
+                        "@document": "RegistryItem",
+                        "@search": "RegistryItem\\QueryRegistry\\Key"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample queries information in the registry to detect whether it is running inside VMware",
+                    "Content": {
+                        "@type": "array",
+                        "Item": [
+                            {
+                                "#text": "\\HARDWARE\\ACPI",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\SYSTEM\\ControlSet001\\Services",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\HARDWARE\\DEVICEMAP\\Scsi\\Scsi Port 0\\Scsi Bus 0\\Target Id 0\\Logical Unit Id 0",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\SYSTEM\\CurrentControlSet\\Enum\\IDE",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\HARDWARE\\DESCRIPTION\\System",
+                                "@type": "string"
+                            },
+                            {
+                                "@type": "string"
+                            }
+                        ]
+                    },
+                    "Context": {
+                        "@document": "RegistryItem",
+                        "@search": "RegistryItem\\QueryRegistry\\Key"
+                    }
+                }
+            ]
+        }
+    }
+}

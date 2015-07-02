@@ -1,0 +1,24 @@
+{
+    "Behaviour": {
+        "@description": "The sample executes Windows tools.",
+        "@name": "Executes_Windows_Tools",
+        "Indicator": {
+            "@operator": "++",
+            "IndicatorItem": {
+                "@condition": "regex_i",
+                "@description": "The sample ",
+                "Content": {
+                    "@type": "array",
+                    "Item": {
+                        "#text": "%SystemRoot%\\systeminfo.exe",
+                        "@type": "string"
+                    }
+                },
+                "Context": {
+                    "@document": "ProcessItem",
+                    "@search": "ProcessItem\\CreateProcess\\FilePath"
+                }
+            }
+        }
+    }
+}

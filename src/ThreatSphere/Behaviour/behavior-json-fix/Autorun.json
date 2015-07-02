@@ -1,0 +1,116 @@
+{
+    "Behaviour": {
+        "@description": "The sample adds itself into autorun entries to restart every time of reboot.",
+        "@name": "Autorun",
+        "Indicator": {
+            "@code": "1",
+            "@operator": "OR",
+            "IndicatorItem": [
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample adds a registry key that automatically starts an executable when the system starts",
+                    "Content": {
+                        "@type": "array",
+                        "Item": [
+                            {
+                                "#text": "\\software\\microsoft\\windows\\currentversion\\run",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\software\\microsoft\\windows\\currentversion\\policies\\explorer\\run",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunServices",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunServicesOnce",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\Software\\Microsoft\\WindowsNT\\CurrentVersion\\Windows\\Run",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\Software\\Microsoft\\WindowsNT\\CurrentVersion\\Windows\\Load",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\SYSTEM\\CurrentControlSet\\Control\\SessionManager\\BootExecute",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\SOFTWARE\\Microsoft\\Active Setup\\Installed Components\\",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "\\software\\microsoft\\windows nt\\currentversion\\winlogon",
+                                "@description": "The sample adds a registry key to override the Windows logon process and automatically start an executable when the system starts",
+                                "@type": "string"
+                            },
+                            {
+                                "@description": "",
+                                "@type": "string"
+                            },
+                            {
+                                "@description": "",
+                                "@type": "string"
+                            },
+                            {
+                                "@description": "",
+                                "@type": "string"
+                            },
+                            {
+                                "@description": "",
+                                "@type": "string"
+                            }
+                        ]
+                    },
+                    "Context": {
+                        "@document": "RegistryItem",
+                        "@search": "RegistryItem\\SetRegistry\\Key"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample writes to the file system to automatically start itself upon reboot.",
+                    "Content": {
+                        "@type": "array",
+                        "Item": [
+                            {
+                                "@description": "The sample writes to the file system in the Startup folder of the Windows Start Menu",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "%UserProfile%\\Start Menu\\Programs\\Startup",
+                                "@description": "",
+                                "@type": "string"
+                            },
+                            {
+                                "@description": "",
+                                "@type": "string"
+                            },
+                            {
+                                "@description": "",
+                                "@type": "string"
+                            }
+                        ]
+                    },
+                    "Context": {
+                        "@document": "FileItem",
+                        "@search": "FileItem\\WriteFile\\FilePath"
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,34 @@
+{
+    "Behaviour": {
+        "@description": "The sample installs sniffer tools to monitor local network traffic",
+        "@name": "Installs_Sniffer_Tools",
+        "Indicator": {
+            "@code": "1",
+            "@operator": "OR",
+            "IndicatorItem": {
+                "@condition": "regex_i",
+                "Content": {
+                    "@type": "array",
+                    "Item": [
+                        {
+                            "#text": "packet.dll",
+                            "@type": "string"
+                        },
+                        {
+                            "#text": "npf.sys",
+                            "@type": "string"
+                        },
+                        {
+                            "#text": "wpacp.dll",
+                            "@type": "string"
+                        }
+                    ]
+                },
+                "Context": {
+                    "@document": "FileItem",
+                    "@search": "FileItem\\WriteFile\\FilePath"
+                }
+            }
+        }
+    }
+}

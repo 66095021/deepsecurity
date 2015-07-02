@@ -1,0 +1,60 @@
+{
+    "Behaviour": {
+        "@description": "The sample makes suspicious changes onto network configurations.",
+        "@name": "Network_Configurations",
+        "Indicator": {
+            "@operator": "++",
+            "IndicatorItem": [
+                {
+                    "@condition": "eq_i",
+                    "@description": "The sample modifies the Windows Hosts file(C:\\Windows\\System32\\driver\\etc\\hosts) to redirect network traffic",
+                    "Content": {
+                        "#text": "%SystemRoot%\\system32\\drivers\\etc\\hosts",
+                        "@type": "string"
+                    },
+                    "Context": {
+                        "@document": "FileItem",
+                        "@search": "FileItem\\WriteFile\\FilePath"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample modifies the registry to bypass the firewall",
+                    "Content": {
+                        "#text": "\\SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy",
+                        "@type": "string"
+                    },
+                    "Context": {
+                        "@document": "RegistryItem",
+                        "@search": "RegistryItem\\SetRegistry\\Key"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample causes the crash reporting program - dw20.exe to run, indicating that the file is corrupted or failed to run",
+                    "Content": {
+                        "@type": "array",
+                        "Item": [
+                            {
+                                "#text": "%SystemRoot%\\system32\\ipconfig.exe",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "%SystemRoot%\\system32\\ping.exe",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "%SystemRoot%\\system32\\netstat.exe",
+                                "@type": "string"
+                            }
+                        ]
+                    },
+                    "Context": {
+                        "@document": "ProcessItem",
+                        "@search": "ProcessItem\\CreateProcess\\FilePath"
+                    }
+                }
+            ]
+        }
+    }
+}

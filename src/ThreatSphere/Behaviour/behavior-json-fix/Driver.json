@@ -1,0 +1,38 @@
+{
+    "Behaviour": {
+        "@description": "The sample tries to install a driver.",
+        "@name": "Install_Drivers",
+        "Indicator": {
+            "@code": "1",
+            "@operator": "OR",
+            "Indicator": {
+                "@description": "The sample writes to the file system in the Windows drivers folder (C:\\Windowsi\\System32i\\drivers)",
+                "@operator": "AND",
+                "IndicatorItem": [
+                    {
+                        "@condition": "regex_i",
+                        "Content": {
+                            "#text": "%SystemRoot%\\system32\\drivers\\",
+                            "@type": "string"
+                        },
+                        "Context": {
+                            "@document": "FileItem",
+                            "@search": "FileItem\\WriteFile\\FilePath"
+                        }
+                    },
+                    {
+                        "@condition": "eq_i",
+                        "Content": {
+                            "#text": "sys",
+                            "@type": "string"
+                        },
+                        "Context": {
+                            "@document": "FileItem",
+                            "@search": "FileItem\\WriteFile\\FileType"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

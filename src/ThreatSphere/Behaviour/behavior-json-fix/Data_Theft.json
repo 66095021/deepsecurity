@@ -1,0 +1,21 @@
+{
+    "Behaviour": {
+        "@description": "The sample encrypts files.",
+        "@name": "Encrypt_Files",
+        "Indicator": {
+            "@code": "1",
+            "@operator": "OR",
+            "IndicatorItem": {
+                "@condition": "regex_i",
+                "Content": {
+                    "#text": "%HoneyPotHome%/Docs",
+                    "@type": "string"
+                },
+                "Context": {
+                    "@document": "FileItem",
+                    "@search": "FileItem\\ReadFile\\FilePath"
+                }
+            }
+        }
+    }
+}

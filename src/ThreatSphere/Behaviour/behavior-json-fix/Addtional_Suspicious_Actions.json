@@ -1,0 +1,83 @@
+{
+    "Behaviour": {
+        "@description": "The sample makes additional suspicious changes onto system .",
+        "@name": "Additional_Suspicious_Actions",
+        "Indicator": {
+            "@operator": "++",
+            "IndicatorItem": [
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample writes to the file system in the Windows system folder",
+                    "Content": {
+                        "#text": "%SystemRoot%",
+                        "@type": "string"
+                    },
+                    "Context": {
+                        "@document": "FileItem",
+                        "@search": "FileItem\\WriteFile\\FilePath"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample causes the crash reporting program - dw20.exe to run, indicating that the file is corrupted or failed to run",
+                    "Content": {
+                        "#text": "\\DW\\DW20.exe",
+                        "@type": "string"
+                    },
+                    "Context": {
+                        "@document": "ProcessItem",
+                        "@search": "ProcessItem\\CreateProcess\\FilePath"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample causes Microsoft Office to crash, indicating that the file is corrupt or an exploit",
+                    "Content": {
+                        "#text": "\\OFFDIAG.exe",
+                        "@type": "string"
+                    },
+                    "Context": {
+                        "@document": "ProcessItem",
+                        "@search": "ProcessItem\\CreateProcess\\FilePath"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample causes the crash reporting program - dwwin.exe to run, indicating that the file is corrupted or failed to run",
+                    "Content": {
+                        "#text": "%SystemRoot%\\system32\\dwwin.exe",
+                        "@type": "string"
+                    },
+                    "Context": {
+                        "@document": "ProcessItem",
+                        "@search": "ProcessItem\\CreateProcess\\FilePath"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample executes a process from within the Windows Recycle Bin",
+                    "Content": {
+                        "#text": "C:\\Recycle.Bin\\",
+                        "@type": "string"
+                    },
+                    "Context": {
+                        "@document": "ProcessItem",
+                        "@search": "ProcessItem\\CreateProcess\\FilePath"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "@description": "The sample adds or changes a registry key to start a Windows service",
+                    "Content": {
+                        "#text": "\\system\\currentcontrolset\\services",
+                        "@type": "string"
+                    },
+                    "Context": {
+                        "@document": "RegistryItem",
+                        "@search": "RegistryItem\\SetRegistry\\Key"
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,143 @@
+{
+    "Behaviour": {
+        "@description": "The sample drops executable files.",
+        "@name": "Drops_Executable_Files",
+        "Indicator": {
+            "@mode": "1",
+            "@operator": "AND",
+            "Indicator": {
+                "@code": "1",
+                "@operator": "OR",
+                "IndicatorItem": [
+                    {
+                        "@condition": "eq_i",
+                        "Content": {
+                            "#text": "application/x-msdos-executable",
+                            "@type": "string"
+                        },
+                        "Context": {
+                            "@document": "FileItem",
+                            "@search": "FileItem\\WriteFile\\FileType"
+                        }
+                    },
+                    {
+                        "@condition": "regex_i",
+                        "Content": {
+                            "#text": ".exe$",
+                            "@type": "string"
+                        },
+                        "Context": {
+                            "@document": "FileItem",
+                            "@search": "FileItem\\WriteFile\\FileName"
+                        }
+                    },
+                    {
+                        "@condition": "regex_i",
+                        "Content": {
+                            "#text": ".vbs$",
+                            "@type": "string"
+                        },
+                        "Context": {
+                            "@document": "FileItem",
+                            "@search": "FileItem\\WriteFile\\FileName"
+                        }
+                    },
+                    {
+                        "@condition": "regex_i",
+                        "Content": {
+                            "#text": ".cmd$",
+                            "@type": "string"
+                        },
+                        "Context": {
+                            "@document": "FileItem",
+                            "@search": "FileItem\\WriteFile\\FileName"
+                        }
+                    },
+                    {
+                        "@condition": "regex_i",
+                        "Content": {
+                            "#text": ".lnk$",
+                            "@type": "string"
+                        },
+                        "Context": {
+                            "@document": "FileItem",
+                            "@search": "FileItem\\WriteFile\\FileName"
+                        }
+                    },
+                    {
+                        "@condition": "regex_i",
+                        "Content": {
+                            "#text": "ProcessItem\\CreateProcess\\FilePath",
+                            "@type": "container"
+                        },
+                        "Context": {
+                            "@document": "FileItem",
+                            "@search": "FileItem\\WriteFile\\FilePath"
+                        }
+                    }
+                ]
+            },
+            "IndicatorItem": [
+                {
+                    "@condition": "regex_i",
+                    "Content": {
+                        "@type": "array",
+                        "Item": [
+                            {
+                                "#text": "%SystemRoot%",
+                                "@code": "1,0,0,0,0",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "%Temp%",
+                                "@code": "0,1,0,0,0",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "%AppData%",
+                                "@code": "0,0,1,0,0",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "%UserProfile%",
+                                "@code": "0,0,0,1,0",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "%Others%",
+                                "@code": "0,0,0,0,1",
+                                "@type": "string"
+                            }
+                        ]
+                    },
+                    "Context": {
+                        "@document": "FileItem",
+                        "@search": "FileItem\\WriteFile\\FilePath"
+                    }
+                },
+                {
+                    "@condition": "regex_i",
+                    "Content": {
+                        "@type": "array",
+                        "Item": [
+                            {
+                                "#text": "%SystemExecutables%",
+                                "@code": "1",
+                                "@type": "string"
+                            },
+                            {
+                                "#text": "%Others%",
+                                "@code": "0",
+                                "@type": "string"
+                            }
+                        ]
+                    },
+                    "Context": {
+                        "@document": "FileItem",
+                        "@search": "FileItem\\WriteFile\\FileName"
+                    }
+                }
+            ]
+        }
+    }
+}
