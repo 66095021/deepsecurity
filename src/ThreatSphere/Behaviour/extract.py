@@ -207,6 +207,12 @@ def get_pid_action(line):
        logger.debug("the extract_list is appened with new one monitor %s" %(extract_list))
 	#we do not care the sbx itself , so return it 
        return
+    #discard any CaptureClient event instead of create process 
+    if pname.find("CaptureClient.exe") != -1 and (meta["type"] != "process" or meta["action"]!="created"):
+       logger.debug("discard all event of CaptureClient.exe ")
+       return
+
+
     # program  NOT started directly by sbx a)maybe run be sub process of sbx b) manually run EXPOLORE.exe
     if pname.find("CaptureClient.exe") == -1 and meta["type"] == "process" and meta["action"]=="created":
        for i  in extract_list:
@@ -248,7 +254,7 @@ def get_pid_action(line):
        logger.debug("the extract_list is appened with new one monitor %s" %(extract_list))
        #we need to update the process creation action if it is a sub process of sbx
        #return
-       return
+       #return
     # stop by the sbx, we can set the status to be done at this point,and send the information to queue
     if pname.find("CaptureClient.exe") != -1 and meta["type"] == "process" and meta["action"]=="terminated":
        for i in extract_list:
@@ -288,7 +294,8 @@ def get_pid_action(line):
     behavior["origin_url_alexa_code"]=-1
     behavior["origin_url_scan_code"]=-1
     behavior["pwd_code"]=-1
-
+    behavior["information"]=[]
+    behavior["information"].append(meta)
     set_file_type_code(behavior)
     set_process_pwd_code(behavior)
     set_origin_url_code(behavior) 
@@ -354,7 +361,7 @@ def  analysis_it(self,path_behavior):
     	        i["behavior_code"]=code
       	        i["behavior_log_number"]=logs_number
                 update_svm_input(i)
-    	        logger.debug("current pid seq %d behavior %s %s %s %s "%(f,name,ret,code,i["svm_input"]))
+    	        logger.debug("current pid seq %d behavior %s %s %s %s, pid is %s process name is %s  "%(f,name,ret,code,i["svm_input"],i["processId"],i["process"]))
                 #f=open('/tmp/xxx','a')
                 #json.dump(extract_list,f)
                 #f.close()
@@ -369,7 +376,7 @@ def  analysis_it(self,path_behavior):
 
                     f=extract_list.index(i)
                     logs_number=len(i["information"])
-                    logger.debug("dealing with the seq %d again extract_list %d since log number changes, log number is %d"%(f,len(extract_list),logs_number))
+    	            logger.debug("current pid seq %d behavior %s %s %s %s, pid is %s process name is %s  "%(f,name,ret,code,i["svm_input"],i["processId"],i["process"]))
                     self.logger.debug("dealing with the element %s  now" %(i))
                     #(name,ret,code)=get_process_behavior_list(i,"./behavior-json-fix")
                     (name,ret,code)=get_process_behavior_list(i,path_behavior)
