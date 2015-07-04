@@ -135,6 +135,7 @@ def  cal_indicator(ioc_info,process_info,parent_code):
 #once the OP is 1, return  right now 
 		if k == 1:
 			if ioc_info["@operator"] == "AND":
+				logger.debug("the specical case AND is 1 the list of AND is %s"%(and_list))
 				return [1,and_list]
 			 
 			
@@ -143,6 +144,7 @@ def  cal_indicator(ioc_info,process_info,parent_code):
 
 #go through all logs, but no lucky, return  0 
 	if ioc_info["@operator"] == "AND":
+		logger.debug("the specical case AND is 0 after going through  logs. the list of AND is %s"%(and_list))
 		return [0, and_list] 
 	if ioc_info["@operator"] == "OR":
 		return [0, or_max]
@@ -241,15 +243,15 @@ def call_items_log(ioc_info, log,process_info):
 	ret=[]
 #if the ioc_info is dict, it means that there is only one item 
 	if type(ioc_info["IndicatorItem"]) is dict:
-		print "ther is only  one item", ioc_info["IndicatorItem"] 
+		logger.debug("ther is only  one item during log rolling %s" %(ioc_info["IndicatorItem"]))
 		ret.append(match_rule_log(ioc_info["IndicatorItem"], process_info,log,ioc_info["@code"]))
-		print "the indicator item list value is %s" %(ret)
+		logger.debug( "the indicator item during log rolling  list value is %s" %(ret)) 
 		return   ret
 # multi items 
 	print "there are items ", ioc_info["IndicatorItem"],  type(ioc_info["IndicatorItem"]), len(ioc_info["IndicatorItem"])
 	for i in ioc_info["IndicatorItem"]:
 		ret.append(match_rule_log(i,process_info,log, ioc_info["@code"]))
-	print "the indicator item list value is %s" %(ret)
+	logger.debug( "the indicator item list value during log rolling  is %s" %(ret))
 	return ret
 
 
@@ -330,25 +332,31 @@ def match_rule_log(item, process_info,log,parent_code):
 #only one element, it is a dict instead of list 
 	elif item["Content"]["@type"] == "array" and item["Content"]["Item"].__class__ is dict:
 		content=item["Content"]["Item"]["#text"]
-		if "@code" not in item["Content"]["Item"]:
+		logger.debug("it is only one array element ")
+		if "@code" not in item["Content"]["Item"].keys():
+			logger.debug("it has no code by default,using parent_code")
 			code=parent_code
 		else:
 			code=item["Content"]["Item"]["@code"]
+			logger.debug("it has default code %s"%(code))
 
 
 	elif item["Content"]["@type"] == "array" and item["Content"]["Item"].__class__ is list :
+		logger.debug("it is  multi array elements ")
 		content_array_flags=1
 		print item["Content"]
 		for i  in item["Content"]["Item"]:
-			if "@code" not in item["Content"]["Item"]:
+			if "@code" not in i.keys():
+				logger.debug("elements %s: it has no code by default,using parent_code"%(i))
 				code_item=parent_code
 			else:
-				code_item=item["Content"]["Item"]["@code"]
-
+				code_item=i["@code"]
+				logger.debug("elements %s: it has  code %s"%(i,code_item))
 			if "#text"  in  i.keys():
 				org=i["#text"]
 				org=format_content(org)
 				content_list.append([org,code_item])
+				logger.debug("in multi array, the text and code list is: %s"%(content_list))
 
 #support container, content_list now contains all matched log from container if has. 
 #content_list is still [[match1,code] , [match2,code]... ] list 
@@ -371,7 +379,7 @@ def match_rule_log(item, process_info,log,parent_code):
 	match_property= act.split('\\')[2]
 
 ######
-	logger.debug("in match_rule function, the match information is type %s, action %s, property %s" %(match_type,match_action,match_property))
+	logger.debug("in match_rule_log function, the match information is type %s, action %s, property %s" %(match_type,match_action,match_property))
 # some process do nothing, so no information 
         if "information" not in process_info.keys():
             return [0,0]
@@ -516,9 +524,13 @@ def match_rule_log(item, process_info,log,parent_code):
 								matched =1 
 
 
-
+	if matched == 0:
+		logger.debug("in match_rule_log function, we uses log:%s to match item:%s  !!!NOTHING!! matched,code is %s "%(list_fake,item, code))
 #############
-	return [matched, 0]
+	else:
+			
+		logger.debug("in match_rule_log function, we uses log:%s to match item:%s  It is  matched, code is %s "%(list_fake,item,code))
+	return [matched, code]
 
 #it calculate  the times of each matched item 
 def cal_indicatoritem_times(ioc_info,process_info):
@@ -562,7 +574,7 @@ def match_rule_times(item, process_info, parent_code):
 #only one element, it is a dict instead of list 
 	elif item["Content"]["@type"] == "array" and item["Content"]["Item"].__class__ is dict:
 		content=item["Content"]["Item"]["#text"]
-		if "@code" not in item["Content"]["Item"]:
+		if "@code" not in item["Content"]["Item"].keys():
 			code=parent_code
 		else:
 			code=item["Content"]["Item"]["@code"]
@@ -787,7 +799,7 @@ def match_rule(item, process_info, parent_code):
 #only one element, it is a dict instead of list 
 	elif item["Content"]["@type"] == "array" and item["Content"]["Item"].__class__ is dict:
 		content=item["Content"]["Item"]["#text"]
-		if "@code" not in item["Content"]["Item"]:
+		if "@code" not in item["Content"]["Item"].keys():
 			code=parent_code
 		else:
 			code=item["Content"]["Item"]["@code"]

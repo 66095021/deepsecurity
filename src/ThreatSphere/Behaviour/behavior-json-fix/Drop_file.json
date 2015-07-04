@@ -6,7 +6,7 @@
             "@mode": "1",
             "@operator": "AND",
             "Indicator": {
-                "@code": "1",
+                "@code": 1,
                 "@operator": "OR",
                 "IndicatorItem": [
                     {
