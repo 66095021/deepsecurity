@@ -536,6 +536,9 @@ def match_rule_log(item, process_info,log,parent_code):
 
 #it calculate  the times of each matched item 
 def cal_indicatoritem_times(ioc_info,process_info):
+	logger.debug("the extract_list is  %s"%(extract_list))
+	index=extract_list.index(process_info)
+	logger.debug("will calculate how many times match dealing with the seq %d in extract_list "%(index))
 	ret=0
 #if the ioc_info is dict, it means that there is only one item 
 	if type(ioc_info["IndicatorItem"]) is dict:
@@ -616,16 +619,20 @@ def match_rule_times(item, process_info, parent_code):
 	match_type=type_map[type]
 	match_action=action_map[act.split('\\')[1]]
 	match_property= act.split('\\')[2]
-	logger.debug("in match_rule function, the match information is type %s, action %s, property %s, content_array_flags %d" %(match_type,match_action,match_property,content_array_flags))
+	logger.debug("in match_rule_times function, the match information is type %s, action %s, property %s, content_array_flags %d" %(match_type,match_action,match_property,content_array_flags))
 	if content_array_flags == 1:
 		logger.debug("the content_array value is %s" %(content_list))
 
 # some process do nothing, so no information 
         if "information" not in process_info.keys():
             return [0,0]
-	for   i    in  process_info["information"]:
+	#for   i    in  process_info["information"]:
+	for   log_index , i    in  enumerate(process_info["information"]):
+		#log_index=process_info["information"].index(i)
+		seq_index=extract_list.index(process_info)
+		logger.debug("process the %dth log  total current log number %d  for seq %d ,log content:%s "%(log_index,len(process_info["information"]), seq_index,i))
 		if  i["type"] ==match_type and i["action"] == match_action :
-			logger.debug( "we found  a type/action line %s,will calculate the rule,the match_type is %s, match_action is %s , match_property is %s , content is %s " %(i,match_type,match_action,match_property,content))
+			logger.debug( "we found  a type/action line %s,will calculate the rule,the match_type is %s, match_action is %s , match_property is %s , content is %s for ++ operator " %(i,match_type,match_action,match_property,content))
 			if content_array_flags  == 0:
 			#file stuff
 				if match_type == "file":
@@ -759,6 +766,10 @@ def match_rule_times(item, process_info, parent_code):
 							if i["object2"].upper() == foo.upper():
 								matched+=1 
 
+			logger.debug("in match_rule_times:  the current log  type/action is matched, and the times of match %d "%(matched))
+		else:
+			logger.debug("in match_rule_times: the current type is %s, item need type is %s : the current action is %s, the item  action is %s , continue to next log " %(i["type"],i["action"], match_type,match_action))
+
 	if matched == 1:
 		logger.debug(" line %s Matchs a rule !!!!!" %(i))
 	logger.debug("the match number for this item is %d"%(matched))
@@ -851,7 +862,10 @@ def match_rule(item, process_info, parent_code):
 # some process do nothing, so no information 
         if "information" not in process_info.keys():
             return [0,0]
-	for   i    in  process_info["information"]:
+	for   log_index , i    in  enumerate(process_info["information"]):
+		#log_index=process_info["information"].index(i)
+		seq_index=extract_list.index(process_info)
+		logger.debug("process the %dth log  total current log number %d  for seq %d ,log content:%s "%(log_index,len(process_info["information"]), seq_index,i))
 		if  i["type"] ==match_type and i["action"] == match_action :
 			logger.debug( "we found  a type/action line %s,will calculate the rule,the match_type is %s, match_action is %s , match_property is %s , content is %s " %(i,match_type,match_action,match_property,content))
 			if content_array_flags  == 0:

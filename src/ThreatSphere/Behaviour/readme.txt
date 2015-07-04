@@ -4,3 +4,5 @@
 
 ./extract.py  logdir jsondir
 
+
+grep "current pid seq" /var/log/behavior.log
