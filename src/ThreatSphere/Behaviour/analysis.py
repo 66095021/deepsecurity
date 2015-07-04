@@ -7,7 +7,7 @@ from logger import *
 
 from map_table import * 
 
-
+from gl import * 
 #one indicator return one list  result ,sub-indicators is a list 
 
 def  cal_indicator(ioc_info,process_info,parent_code):
@@ -306,6 +306,8 @@ def cal_container_value(item, process_info):
 # return [0|1] matches this rule when one log roll in 
 def match_rule_log(item, process_info,log,parent_code):
 
+	index=extract_list.index(process_info)
+	logger.debug("match_rule_log will deal with the seq %d in extract_list "%(index))
 
 	matched =0
 	condition=item["@condition"]
@@ -766,14 +768,17 @@ def match_rule_times(item, process_info, parent_code):
 #replace the window marco 
 def  format_content(content):
 	logger.debug("the orgin content is %s"%content)
-	for i  in  pwd_process.keys():
-		content=content.replace(i, pwd_process[i])
+	for i  in  window_macro_map.keys():
+		content=content.replace(i, window_macro_map[i])
 	logger.debug("after the replace is %s"%(content))
 	return content
 
 #item is a dict of rule, return [ 0|1 , code ] matches this rule
 #if code is defined, use it or  inherit from parent 
 def match_rule(item, process_info, parent_code):
+	logger.debug("the extract_list is  %s"%(extract_list))
+	index=extract_list.index(process_info)
+	logger.debug("match_rule will deal with the seq %d in extract_list "%(index))
 	matched =0
 	condition=item["@condition"]
 	type=item["Context"]["@document"]
@@ -981,9 +986,14 @@ def match_rule(item, process_info, parent_code):
 						for   foo in value_list:
 							if i["object2"].upper() == foo.upper():
 								matched =1 
+			logger.debug("in match_rule:  the current log  type/action is matched, and the text compared result %d "%(matched))
+		else:
+			logger.debug("in match_rule: the current type is %s, item need type is %s : the current action is %s, the item  action is %s , continue to next log " %(i["type"],i["action"], match_type,match_action))
 
 	if matched == 1:
-		logger.debug(" line %s Matchs a rule !!!!!" %(i))
+		logger.debug(" in match_rule :After current logs is checked,  Matchs a rule !!!!!")
+	else:
+		logger.debug("in match_rule: no luck to match the rule for all current logs ")
 	return [matched, code]
 #return a list [ 1, 0, 1 , 1... ] each is a return value of ruleN
 

@@ -68,7 +68,7 @@ from networkinfo import *
 from analysis import * 
 from geturl import * 
 from map_table import * 
-
+from gl import * 
 def update_svm_input(pid_info):
     logger.debug("update_svm_input it")
     code=pid_info["behavior_code"]
@@ -163,7 +163,7 @@ def get_meta_of_line(line):
     return meta
 
 #extract_list contains the all the extracting PID dict
-extract_list=[]
+#extract_list=[]
 
 def get_pid_action(line):
     global extract_list

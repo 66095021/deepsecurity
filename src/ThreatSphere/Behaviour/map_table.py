@@ -1,6 +1,16 @@
 #!/usr/bin/env python
 
 
+window_macro_map={
+
+"%SystemRoot%":   'c:\\windows',
+"%ProgramFiles%" : 'c:\\Program files',
+"%Temp%":  'C:\\Users\\bcheng\\AppData\\Local\\Temp',
+"%AppData%":  'C:\\Users\\bcheng\\AppData\\Roaming ',  
+"%UserProfile%": ' C:\\Users\\foo',
+"%HoneyPotHome": 'C:\\test'
+
+}
 pwd_process={
 
 "%SystemRoot%":   'c:\\windows',
