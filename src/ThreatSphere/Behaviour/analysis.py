@@ -624,10 +624,16 @@ def match_rule_times(item, process_info, parent_code):
 		logger.debug("the content_array value is %s" %(content_list))
 
 # some process do nothing, so no information 
-        if "information" not in process_info.keys():
-            return [0,0]
-	#for   i    in  process_info["information"]:
-	for   log_index , i    in  enumerate(process_info["information"]):
+	if "information" not in process_info.keys():
+        	return  0
+#optimize it only search hash_info 
+	if  match_type not in process_info["hash_info"]:
+ 		return 0
+	if match_action  not in  process_info["hash_info"][match_type]:
+		return 0
+	#for   log_index , i    in  enumerate(process_info["information"]):
+	for   log_index , i    in  enumerate(process_info["hash_info"][match_type][match_action]):
+	#for   log_index , i    in  enumerate(process_info["information"]):
 		#log_index=process_info["information"].index(i)
 		seq_index=extract_list.index(process_info)
 		logger.debug("process the %dth log  total current log number %d  for seq %d ,log content:%s "%(log_index,len(process_info["information"]), seq_index,i))
@@ -860,9 +866,15 @@ def match_rule(item, process_info, parent_code):
 		logger.debug("the content_array value is %s" %(content_list))
 
 # some process do nothing, so no information 
-        if "information" not in process_info.keys():
-            return [0,0]
-	for   log_index , i    in  enumerate(process_info["information"]):
+	if "information" not in process_info.keys():
+        	return [0,0]
+#optimize it only search hash_info 
+	if  match_type not in process_info["hash_info"]:
+ 		return [0,0]
+	if match_action  not in  process_info["hash_info"][match_type]:
+		return [0,0]
+	#for   log_index , i    in  enumerate(process_info["information"]):
+	for   log_index , i    in  enumerate(process_info["hash_info"][match_type][match_action]):
 		#log_index=process_info["information"].index(i)
 		seq_index=extract_list.index(process_info)
 		logger.debug("process the %dth log  total current log number %d  for seq %d ,log content:%s "%(log_index,len(process_info["information"]), seq_index,i))

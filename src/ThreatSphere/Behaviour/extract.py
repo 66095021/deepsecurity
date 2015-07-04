@@ -69,6 +69,22 @@ from analysis import *
 from geturl import * 
 from map_table import * 
 from gl import * 
+
+
+
+def add_meta_to_pid_info(pid_info,meta):
+    pid_info["information"].append(meta)
+    if "hash_info" not in pid_info.keys():
+        pid_info["hash_info"]={}
+    if meta["type"] not in pid_info["hash_info"].keys():
+        pid_info["hash_info"][meta["type"]]={}
+    if meta["action"] not in pid_info["hash_info"][meta["type"]].keys():
+        pid_info["hash_info"][meta["type"]][meta["action"]]=[]
+
+    pid_info["information"].append(meta)
+    pid_info["hash_info"][meta["type"]][meta["action"]].append(meta)
+        
+
 def update_svm_input(pid_info):
     logger.debug("update_svm_input it")
     code=pid_info["behavior_code"]
@@ -180,129 +196,136 @@ def get_pid_action(line):
     #  2b) if we met the terminate action from Captureclient, we need to change the status to done. push it into queue 
 
     # start up the program by sbx 
-    if pname.find("CaptureClient.exe") != -1 and meta["type"] == "process" and meta["action"]=="created":
-       behavior={}
-       behavior["processId"]=meta["object1"]
-       behavior["process"]=meta["object2"]
-       behavior["start_time"]=meta["time"]
-       behavior["start_utc_time"]=meta["utc_time"]
-       behavior["status"]="running"
-       behavior["start_directly_by_sbx"]=1
-       behavior["parent_pid"]=meta["processId"]
-       behavior["parent_img"]=meta["process"]
-       behavior["analysis_done_action"]=0
-       # support type , url, original url, process work dir code 
-       behavior["filetype_code"]=-1
-       behavior["url_alexa_code"]=-1
-       behavior["url_scan_code"]=-1
-       behavior["origin_url_alexa_code"]=-1
-       behavior["origin_url_scan_code"]=-1
-       behavior["pwd_code"]=-1
-       
-       set_file_type_code(behavior)
-       set_process_pwd_code(behavior)
+    if pname.find("CaptureClient.exe") != -1:
+        logger.debug("it is a Captureclient event log ")
+        if  meta["type"] == "process" and meta["action"]=="created":
+            behavior={}
+            behavior["processId"]=meta["object1"]
+            behavior["process"]=meta["object2"]
+            behavior["start_time"]=meta["time"]
+            behavior["start_utc_time"]=meta["utc_time"]
+            behavior["status"]="running"
+            behavior["start_directly_by_sbx"]=1
+            behavior["parent_pid"]=meta["processId"]
+            behavior["parent_img"]=meta["process"]
+            behavior["analysis_done_action"]=0
+            # support type , url, original url, process work dir code 
+            behavior["filetype_code"]=-1
+            behavior["url_alexa_code"]=-1
+            behavior["url_scan_code"]=-1
+            behavior["origin_url_alexa_code"]=-1
+            behavior["origin_url_scan_code"]=-1
+            behavior["pwd_code"]=-1
+            
+            set_file_type_code(behavior)
+            set_process_pwd_code(behavior)
 
-       logger.debug("it is a initial monitor PID %s started by sbx " %(behavior))
-       extract_list.append(behavior)
-       logger.debug("the extract_list is appened with new one monitor %s" %(extract_list))
-	#we do not care the sbx itself , so return it 
-       return
-    #discard any CaptureClient event instead of create process 
-    if pname.find("CaptureClient.exe") != -1 and (meta["type"] != "process" or meta["action"]!="created"):
-       logger.debug("discard all event of CaptureClient.exe ")
-       return
-
-
-    # program  NOT started directly by sbx a)maybe run be sub process of sbx b) manually run EXPOLORE.exe
-    if pname.find("CaptureClient.exe") == -1 and meta["type"] == "process" and meta["action"]=="created":
-       for i  in extract_list:
-           if i["processId"] == meta["object1"] and i["process"] == meta["object2"]:
-               logger.debug("it is a create process event, but there is already in extract_list,just update parent etc")
-               i["start_time"]=meta["time"]
-               i["start_utc_time"]=meta["utc_time"]
-               i["status"]="running"
-               i["start_directly_by_sbx"]=0
-               i["parent_pid"]=meta["processId"]
-               i["parent_img"]=meta["process"]
-               i["analysis_done_action"]=0
-               return 
-       logger.debug("it is a create process event, and there is NO info in extract_list, will add it")
-       behavior={}
-       behavior["processId"]=meta["object1"]
-       behavior["process"]=meta["object2"]
-       behavior["start_time"]=meta["time"]
-       behavior["start_utc_time"]=meta["utc_time"]
-       behavior["status"]="running"
-       behavior["start_directly_by_sbx"]=0
-       behavior["parent_pid"]=meta["processId"]
-       behavior["parent_img"]=meta["process"]
-       behavior["analysis_done_action"]=0
-       # support type , url, original url, process work dir code 
-       behavior["filetype_code"]=-1
-       behavior["url_alexa_code"]=-1
-       behavior["url_scan_code"]=-1
-       behavior["origin_url_alexa_code"]=-1
-       behavior["origin_url_scan_code"]=-1
-       behavior["pwd_code"]=-1
-
-       set_file_type_code(behavior)
-       set_process_pwd_code(behavior)
-       set_origin_url_code(behavior) 
-       logger.debug("it is a initial monitor PID %s NOT directly started by sbx " %(behavior))
-       logger.debug("it is a initial monitor PID")
-       extract_list.append(behavior)
-       logger.debug("the extract_list is appened with new one monitor %s" %(extract_list))
-       #we need to update the process creation action if it is a sub process of sbx
-       #return
-       #return
-    # stop by the sbx, we can set the status to be done at this point,and send the information to queue
-    if pname.find("CaptureClient.exe") != -1 and meta["type"] == "process" and meta["action"]=="terminated":
-       for i in extract_list:
-           if i["processId"] == meta["object1"]:
-               i["status"]="done"
-               i["stop_time"]=meta["time"]
-               i["stop_utc_time"]=meta["utc_time"]
-               logger.debug("the PID %s is terminated" %(i["processId"]))
-               break
-       return
-   # no sbx, it is a monitor pid action, then update it into extract_list element about the pid
-    for i in extract_list:
-        if i["processId"]==meta["processId"]:
-        # if no information, it is a new monitor pid without any type/action info, so make a list to store    
-            if "information" not in i.keys():
-                i["information"]=[]
-        # has now, so store the meta into it
-            i["information"].append(meta) 
-            i["last_log_time"]=meta["time"]
-            i["last_log_utc_time"]=meta["utc_time"]  
-            i["current_action_number"]=len(i["information"])
-        # update network information
-            #get_network_information(meta,i)
-            logger.debug("it is nomral event log for PID , the PID can be found in extract_list, update information")
+            logger.debug("it is a initial monitor PID %s started by sbx " %(behavior))
+            extract_list.append(behavior)
+            logger.debug("the extract_list is appened with new one monitor %s" %(extract_list))
+             #we do not care the sbx itself , so return it 
+            return
+        else:
+            logger.debug("discard all other events of CaptureClient.exe ")
             return  
-   #get a pid action but there is no exsiting info in extract_list yet
 
+    else:
+        res_exist=0
+        for i in extract_list:
+            if i["processId"]==meta["processId"] and i["process"]==meta["process"]:
+                res_exist=1
 
-    behavior={}
-    behavior["processId"]=meta["processId"]
-    behavior["process"]=meta["process"]
-    behavior["analysis_done_action"]=0
-    # support type , url, original url, process work dir code 
-    behavior["filetype_code"]=-1
-    behavior["url_alexa_code"]=-1
-    behavior["url_scan_code"]=-1
-    behavior["origin_url_alexa_code"]=-1
-    behavior["origin_url_scan_code"]=-1
-    behavior["pwd_code"]=-1
-    behavior["information"]=[]
-    behavior["information"].append(meta)
-    set_file_type_code(behavior)
-    set_process_pwd_code(behavior)
-    set_origin_url_code(behavior) 
-    logger.debug("it is a strange initial monitor PID %s NOT directly started by sbx  " %(behavior))
-    extract_list.append(behavior)
-    logger.debug("the extract_list is appened with new one strange monitor %s" %(extract_list))
+        if  res_exist == 1:
+
+            for i in extract_list:
+                if i["processId"]==meta["processId"] and i["process"]==meta["process"]:
+                # if no information, it is a new monitor pid without any type/action info, so make a list to store    
+                    if "information" not in i.keys():
+                        i["information"]=[]
+                # has now, so store the meta into it
+                    #i["information"].append(meta) 
+                    i["last_log_time"]=meta["time"]
+                    i["last_log_utc_time"]=meta["utc_time"]  
+        
+                    add_meta_to_pid_info(i,meta)
+                    i["current_action_number"]=len(i["information"])
+                # update network information
+                    #get_network_information(meta,i)
+                logger.debug("it is nomral event log for PID %s prcoss %s , the PID can be found in extract_list, update information done "%(i["processId"], i["process"]))
+        else:
+               
+            logger.debug("it is nomral event log  , the PID can be  NOT found in extract_list")
+            behavior={}
+            behavior["processId"]=meta["processId"]
+            behavior["process"]=meta["process"]
+            #behavior["start_time"]=meta["time"]
+            #behavior["start_utc_time"]=meta["utc_time"]
+            behavior["status"]="running"
+            #behavior["start_directly_by_sbx"]=0
+            #behavior["parent_pid"]=meta["processId"]
+            #behavior["parent_img"]=meta["process"]
+            #behavior["analysis_done_action"]=0
+            # support type , url, original url, process work dir code 
+            behavior["filetype_code"]=-1
+            behavior["url_alexa_code"]=-1
+            behavior["url_scan_code"]=-1
+            behavior["origin_url_alexa_code"]=-1
+            behavior["origin_url_scan_code"]=-1
+            behavior["pwd_code"]=-1
+    
+            set_file_type_code(behavior)
+            set_process_pwd_code(behavior)
+            set_origin_url_code(behavior) 
+            behavior["information"]=[]
+            add_meta_to_pid_info(behavior,meta)
+            extract_list.append(behavior)
+            logger.debug("the extract_list is appened with new one monitor %s" %(extract_list))
+
+        if  meta["action"]=="created" and meta["type"]== "process":
+            
+            
+           res_exist=0
+           for i in extract_list:
+               if i["processId"]==meta["object1"] and i["process"]==meta["object2"]:
+                   res_exist=1
+           if res_exist ==1:
+                    
+               for i  in extract_list:
+                   if i["processId"] == meta["object1"] and i["process"] == meta["object2"]:
+                       logger.debug("it is a create process event, but there is already in extract_list,just update parent etc")
+                       i["start_time"]=meta["time"]
+                       i["start_utc_time"]=meta["utc_time"]
+                       i["status"]="running"
+                       i["start_directly_by_sbx"]=0
+                       i["parent_pid"]=meta["processId"]
+                       i["parent_img"]=meta["process"]
+                       i["analysis_done_action"]=0
+           else:
+               
+               behavior={}
+               behavior["processId"]=meta["object1"]
+               behavior["process"]=meta["object2"]
+               behavior["start_time"]=meta["time"]
+               behavior["start_utc_time"]=meta["utc_time"]
+               behavior["status"]="running"
+               behavior["start_directly_by_sbx"]=0
+               behavior["parent_pid"]=meta["processId"]
+               behavior["parent_img"]=meta["process"]
+               behavior["analysis_done_action"]=0
+               # support type , url, original url, process work dir code 
+               behavior["filetype_code"]=-1
+               behavior["url_alexa_code"]=-1
+               behavior["url_scan_code"]=-1
+               behavior["origin_url_alexa_code"]=-1
+               behavior["origin_url_scan_code"]=-1
+               behavior["pwd_code"]=-1
        
+               set_file_type_code(behavior)
+               set_process_pwd_code(behavior)
+               set_origin_url_code(behavior) 
+               extract_list.append(behavior)
+               logger.debug("the extract_list is appened with new one monitor %s" %(extract_list))
+                            
 def get_pid_info_from_file(file):
     f=open(file,'r')
     logger.debug("now extract information from file %s" %(file))
