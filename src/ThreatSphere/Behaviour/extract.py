@@ -72,6 +72,15 @@ from gl import *
 
 
 
+def do_url_rank_job(url,pid_info):
+        logger.debug("url event, %s will get the ranks for PID %s process %s!"%(url,pid_info["processId"],pid_info["process"]))
+        res=get_url_rank(url)      
+        logger.debug("list of url rank info is %s"%(res))
+        pid_info["url_scan_code"]=res[1]
+        pid_info["url_alexa_code"]=res[2]
+        logger.debug("scan rank result  info is %d: alexa_rank is %d "%(res[1],res[2]))
+	logger.debug("set PID %s process %s  rank result  info scan_rank is %d: alexa_rank is %d "%(pid_info["processId"],pid_info["process"],pid_info["url_scan_code"],pid_info["url_alexa_code"]))
+
 def add_meta_to_pid_info(pid_info,meta):
     pid_info["information"].append(meta)
     if "hash_info" not in pid_info.keys():
@@ -83,10 +92,22 @@ def add_meta_to_pid_info(pid_info,meta):
 
     pid_info["information"].append(meta)
     pid_info["hash_info"][meta["type"]][meta["action"]].append(meta)
-        
-
+    if meta["type"] == "url":
+         url=meta["object1"]
+         logger.debug("url event, I will fork other thread to get the rank to avoid blocking reading log")
+         url_worker=MyThread3(url, pid_info) 
+         url_worker.setName("Thread3-urlranker")
+         url_worker.start()
+#        url=meta["object1"] 
+#        logger.debug("url event, %s will get the ranks for PID %s process %s!"%(url,pid_info["processId"],pid_info["process"]))
+#        res=get_url_rank(url)      
+#        logger.debug("list of url rank info is %s"%(res))
+#        pid_info["url_scan_code"]=res[1]
+#        pid_info["url_alexa_code"]=res[2]
+#        logger.debug("scan rank result  info is %d: alexa_rank is %d "%(res[1],res[2]))
+#	logger.debug("set PID %s process %s  rank result  info scan_rank is %d: alexa_rank is %d "%(pid_info["processId"],pid_info["process"],pid_info["url_scan_code"],pid_info["url_alexa_code"]))
 def update_svm_input(pid_info):
-    logger.debug("update_svm_input it")
+    logger.debug("update_svm_input for input ")
     code=pid_info["behavior_code"]
     bin=pid_info["behavior_result"]
     logger.debug("code is %s , bin is %s" %(code, bin))
@@ -110,7 +131,7 @@ def update_svm_input(pid_info):
     pid_info["svm_input"].append(pid_info["url_scan_code"])
     pid_info["svm_input"].append(pid_info["origin_url_alexa_code"])
     pid_info["svm_input"].append(pid_info["origin_url_scan_code"])
-
+    logger.debug("update_svm_input done,the new input is %s"%(pid_info["svm_input"]))
 #get file type from  name 
 def set_file_type_code(pid_info):
     process_name=pid_info["process"] 
@@ -384,14 +405,20 @@ def  analysis_it(self,path_behavior):
     	        i["behavior_code"]=code
       	        i["behavior_log_number"]=logs_number
                 update_svm_input(i)
-    	        logger.debug("current pid seq %d behavior %s %s %s %s, pid is %s process name is %s  "%(f,name,ret,code,i["svm_input"],i["processId"],i["process"]))
+    	        logger.debug("first time to do behavior: current pid seq %d behavior  name:%s bin:%s code: %s svm_input: %s, pid is %s process name is %s  "%(f,name,ret,code,i["svm_input"],i["processId"],i["process"]))
                 #f=open('/tmp/xxx','a')
                 #json.dump(extract_list,f)
                 #f.close()
 #next behavior on it.  if no logs append, then ignore it
             else:
 	        if i["behavior_log_number"] == len(i["information"]):
-                    logger.debug("seq %d log number is NOT changed, continue to next "%(extract_list.index(i)))
+                    logger.debug("seq %d log number is NOT changed, will handle the url code  then continue to next "%(extract_list.index(i)))
+                    logger.debug("seq %d the current pid %s  scan and alexa rank is %d ,%d , the input is %d %d  "%(extract_list.index(i),  i["processId"],i["url_scan_code"],i["url_alexa_code"],  i["svm_input"][-3],  i["svm_input"][-4]))
+                    i["svm_input"][-3]=i["url_scan_code"]
+                    i["svm_input"][-4]=i["url_alexa_code"]
+                    logger.debug("After replacement , the current %s scan and alexa code is %d %d"%(i["processId"],i["url_scan_code"],i["url_alexa_code"]))
+                    #logger.debug("whole input is %s"%(i["svm_input"]))
+    	            logger.debug("log is the same just update url rank: current pid seq %d behavior  name:%s bin:%s code: %s svm_input: %s, pid is %s process name is %s  "%(extract_list.index(i),name,ret,code,i["svm_input"],i["processId"],i["process"]))
                     continue
 
                 else:
@@ -399,7 +426,7 @@ def  analysis_it(self,path_behavior):
 
                     f=extract_list.index(i)
                     logs_number=len(i["information"])
-    	            logger.debug("current pid seq %d behavior %s %s %s %s, pid is %s process name is %s  "%(f,name,ret,code,i["svm_input"],i["processId"],i["process"]))
+    	            logger.debug("log increase: current pid seq %d behavior name:%s bin:%s code:%s svm_input: %s, pid is %s process name is %s  "%(f,name,ret,code,i["svm_input"],i["processId"],i["process"]))
                     self.logger.debug("dealing with the element %s  now" %(i))
                     #(name,ret,code)=get_process_behavior_list(i,"./behavior-json-fix")
                     (name,ret,code)=get_process_behavior_list(i,path_behavior)
@@ -407,7 +434,8 @@ def  analysis_it(self,path_behavior):
                     i["behavior_result"]=ret
     	            i["behavior_code"]=code
       	            i["behavior_log_number"]=logs_number
-    	            logger.debug("current pid seq %d behavior %s %s %s"%(f,name,ret,code))
+    	            #logger.debug("current pid seq %d behavior %s %s %s"%(f,name,ret,code))
+    	            logger.debug("log increase: the new info current pid seq %d behavior name:%s bin:%s code: %s svm_input:%s, pid is %s process name is %s  "%(f,name,ret,code,i["svm_input"],i["processId"],i["process"]))
 	
 class MyThread(threading.Thread):
      def __init__(self):  
@@ -427,6 +455,16 @@ class MyThread2(threading.Thread):
          self.logger.debug("analysis_it working now")
          analysis_it(self,sys.argv[2])
 
+class MyThread3(threading.Thread):
+     def __init__(self, url ,pid_info ):  
+        threading.Thread.__init__(self)  
+        self.logger=logger
+        self.url=url
+        self.pid_info=pid_info
+        #self.num = num
+     def run(self):
+         self.logger.debug("get url rank is  working now")
+         do_url_rank_job(self.url,self.pid_info)
 
 def handler(signum, frame):
     print "receive a signal %d"%(signum)
