@@ -2,14 +2,33 @@
 
 import json
 import sys
+import re 
 from dirutil import *
 from logger import * 
-
 from map_table import * 
-
 from gl import * 
-#one indicator return one list  result ,sub-indicators is a list 
 
+#flags =1 means ignore case 
+def do_search(flags, regex, content):
+	logger.debug("regex search flag %d , regex is %s, content is %s "%(flags, regex,content))
+	regex=regex.replace('\\', '\\\\')
+	result=None
+	match=0
+	if flags == 1 :
+		result=re.search(regex, content,re.I)
+		if result == None:
+			match=0
+		else:
+			match=1 
+	else:
+		result=re.search(regex, content)
+		if result == None:
+			match=0
+		else:
+			match=1
+	logger.debug("regex search done, the result is %d  "%(match))
+#one indicator return one list  result ,sub-indicators is a list 
+	return match
 def  cal_indicator(ioc_info,process_info,parent_code):
 	logger.debug("go into cal_indicator")
 	if "@mode"  not in  ioc_info.keys() or  ioc_info["@mode"]==0 or ioc_info["@mode"] == "0":
@@ -99,6 +118,7 @@ def  cal_indicator(ioc_info,process_info,parent_code):
 			code=ioc_info["@code"]
 		and_list=[]
 		or_max=0
+		code_max=0
 		logger.debug("using log  %s to calculating the now "%(i) )
 		for j  in (call_items_log(ioc_info, i,process_info)):
 			logger.debug("the current item result is %s"%j)
@@ -121,35 +141,48 @@ def  cal_indicator(ioc_info,process_info,parent_code):
 		logger.debug("the current sub elements result is %s"%(current_sub))		
 #calculate the OP value when log rolling 
 		k=op_it(ioc_info,ret)
-#calculate  the code of AND and OR 
-		if ioc_info["@operator"] == "AND":
-			for  i  in current_sub:
-				and_list.append(i[1])
-			logger.debug("the and_list now is %s"%(and_list))
-		if ioc_info["@operator"] == "OR":
-			for  i  in current_sub:
-				if i[1]> or_max:
-					or_max=i[1]
+##calculate  the code of AND and OR 
+#		if ioc_info["@operator"] == "AND":
+#			for  i  in current_sub:
+#				and_list.append(i[1])
+#			logger.debug("the and_list now is %s"%(and_list))
+#		if ioc_info["@operator"] == "OR":
+#			for  i  in current_sub:
+#				if i[1]> or_max:
+#					or_max=i[1]
+#
+#
+##once the OP is 1, return  right now 
+#		if k == 1:
+#			if ioc_info["@operator"] == "AND":
+#				logger.debug("the specical case AND is 1 the list of AND is %s"%(and_list))
+#				return [1,and_list]
+#			 
+#			
+#			if ioc_info["@operator"] == "OR":
+#				return [1,or_max]
+#
+
+# when mode =1 , just return the max code  if OP bin is 1 , so find the max code first, if the op is 1, return 1
 
 
-#once the OP is 1, return  right now 
-		if k == 1:
-			if ioc_info["@operator"] == "AND":
-				logger.debug("the specical case AND is 1 the list of AND is %s"%(and_list))
-				return [1,and_list]
-			 
-			
-			if ioc_info["@operator"] == "OR":
-				return [1,or_max]
-
+		for  i   in  current_sub:
+			if i[0]==1:
+				if i[1] > code_max:
+					code_max=i[1]
+		
+		if k==1:
+			return [k,code_max]
 #go through all logs, but no lucky, return  0 
-	if ioc_info["@operator"] == "AND":
-		logger.debug("the specical case AND is 0 after going through  logs. the list of AND is %s"%(and_list))
-		return [0, and_list] 
-	if ioc_info["@operator"] == "OR":
-		return [0, or_max]
-
-
+#	if ioc_info["@operator"] == "AND":
+#		logger.debug("the specical case AND is 0 after going through  logs. the list of AND is %s"%(and_list))
+#		#return [0, and_list] 
+#	
+#	if ioc_info["@operator"] == "OR":
+#		return [0, or_max]
+#
+	logger.debug("After checking all logs , no luck for mode=1 ,will return [0,0]")
+	return [0,0]		
 # get the indicator value , ret contains all items and directly sub-indicators
 def op_it(node, ret):
 	print (type(ret))
@@ -385,6 +418,14 @@ def match_rule_log(item, process_info,log,parent_code):
 # some process do nothing, so no information 
         if "information" not in process_info.keys():
             return [0,0]
+	if  match_type not in process_info["hash_info"]:
+		logger.debug("in match_rule_log function, there is no %s type in the hash log"%(match_type))
+ 		return [0,0]
+	if match_action  not in  process_info["hash_info"][match_type]:
+		logger.debug("in match_rule_log function, there is no %s action in the hash log "%(match_action))
+		return [0,0]
+	#for   log_index , i    in  enumerate(process_info["information"]):
+	#for   log_index , i    in  enumerate(process_info["hash_info"][match_type][match_action]):
 	list_fake=[]
 	list_fake.append(log)
 	for   i    in  list_fake:
@@ -396,45 +437,67 @@ def match_rule_log(item, process_info,log,parent_code):
 			#file stuff
 				if match_type == "file":
 					if condition == "regex":
-						if content in i["object1"]:
+						ret=do_search(0, content, i["object1"])
+						if ret == 1:
 							matched=1
 	
-					if condition == "is":
+					if condition == "is" or condition == "eq":
 						if content == i["object1"]:
+							matched=1
+					if  condition == "eq_i":
+						if content.upper() == i["object1"].upper():
 							matched=1
 			
 					if condition == "regex_i":
-						if content.upper() in i["object1"].upper():
+						ret=do_search(1,content, i["object1"])
+						if ret == 1:
 							matched=1
 	
 			
 	
 			#reg stuff
 				if match_type == "registry":
+
+
 					if condition == "regex":
-						if content in i["object1"]:
+						ret=do_search(0, content, i["object1"])
+						if ret == 1:
 							matched=1
 	
-					if condition == "is":
+					if condition == "is" or condition == "eq":
 						if content == i["object1"]:
 							matched=1
-					if condition == "regex_i":
-						if content.upper() in i["object1"].upper():
+					if  condition == "eq_i":
+						if content.upper() == i["object1"].upper():
 							matched=1
+			
+					if condition == "regex_i":
+						ret=do_search(1,content, i["object1"])
+						if ret == 1:
+							matched=1
+
 			#process stuff
 				if match_type == "process":
 					logger.debug("bobo match the process rule,the process path is %s"%(i["object2"]))
+
+
 					if condition == "regex":
-						if content in i["object1"]:
+						ret=do_search(0, content, i["object1"])
+						if ret == 1:
 							matched=1
 	
-					if condition == "is":
+					if condition == "is" or condition == "eq":
 						if content == i["object1"]:
 							matched=1
-					if condition == "regex_i":
-						logger.debug(content)
-						if content.upper() in i["object1"].upper():
+					if  condition == "eq_i":
+						if content.upper() == i["object1"].upper():
 							matched=1
+			
+					if condition == "regex_i":
+						ret=do_search(1,content, i["object1"])
+						if ret == 1:
+							matched=1
+
 					# it means the content value is other rule value instead of literal text
 					if condition ==  "cross_match":
 						#find matched items to get the value 
@@ -453,62 +516,90 @@ def match_rule_log(item, process_info,log,parent_code):
 			if content_array_flags  == 1:
 			#file stuff
 				if match_type == "file":
-					for  j  in  content_list:
-						if condition == "regex":
-							if j[0] in i["object1"]:
+					# content_list is [text, code]
+					if condition == "regex":
+						for  j  in  content_list:
+							ret=do_search(0, j[0], i["object1"])
+							if ret == 1:
 								matched=1
 								code=j[1]
-					if condition == "is":
-						for j  in content_list:
+					if condition == "is" or condition == "eq":
+						for  j  in  content_list:
 							if j[0] == i["object1"]:
 								matched=1
 								code=j[1]
-					if condition == "regex_i":
-						for j  in content_list:
-							print content_list
-							if j[0].upper() in i["object1"].upper():
+						
+					if  condition == "eq_i":
+						for  j  in  content_list:
+							if j[0].upper() == i["object1"].upper():
 								matched=1
 								code=j[1]
-	
+					if condition == "regex_i":
+						for  j  in  content_list:
+							ret=do_search(1,j[0], i["object1"])
+							if ret == 1:
+								matched=1
+								code=j[1]
 			
 	
 			#reg stuff
 				if match_type == "registry":
+
+					# content_list is [text, code]
 					if condition == "regex":
-						for j in content_list:
-							if j[0] in i["object1"]:
+						for  j  in  content_list:
+							ret=do_search(0, j[0], i["object1"])
+							if ret == 1:
 								matched=1
 								code=j[1]
-	
-					if condition == "is":
-						for j[0] in content_list:
-							if j == i["object1"]:
-								code=j[1]
+					if condition == "is" or condition == "eq":
+						for  j  in  content_list:
+							if j[0] == i["object1"]:
 								matched=1
+								code=j[1]
+						
+					if  condition == "eq_i":
+						for  j  in  content_list:
+							if j[0].upper() == i["object1"].upper():
+								matched=1
+								code=j[1]
 					if condition == "regex_i":
-						for j in content_list:
-							if j[0].upper() in i["object1"].upper():
+						for  j  in  content_list:
+							ret=do_search(1,j[0], i["object1"])
+							if ret == 1:
 								matched=1
 								code=j[1]
 			#process stuff
 				if match_type == "process":
 					logger.debug("bobo match the process rule,the process path is %s"%(i["object2"]))
+
+
+
+					# content_list is [text, code]
 					if condition == "regex":
-						for j  in content_list:
-							if j[0] in i["object1"]:
+						for  j  in  content_list:
+							ret=do_search(0, j[0], i["object1"])
+							if ret == 1:
 								matched=1
 								code=j[1]
-	
-					if condition == "is":
-						for j[0]  in content_list:
-							if j == i["object1"]:
-								code=j[1]
+					if condition == "is" or condition == "eq":
+						for  j  in  content_list:
+							if j[0] == i["object1"]:
 								matched=1
+								code=j[1]
+						
+					if  condition == "eq_i":
+						for  j  in  content_list:
+							if j[0].upper() == i["object1"].upper():
+								matched=1
+								code=j[1]
 					if condition == "regex_i":
-						for j  in content_list:
-							if j[0].upper() in i["object1"].upper():
+						for  j  in  content_list:
+							ret=do_search(1,j[0], i["object1"])
+							if ret == 1:
 								matched=1
 								code=j[1]
+
 					# it means the content value is other rule value instead of literal text
 					if condition ==  "cross_match":
 						#find matched items to get the value 
@@ -639,49 +730,72 @@ def match_rule_times(item, process_info, parent_code):
 		logger.debug("process the %dth log  total current log number %d  for seq %d ,log content:%s "%(log_index,len(process_info["information"]), seq_index,i))
 		if  i["type"] ==match_type and i["action"] == match_action :
 			logger.debug( "we found  a type/action line %s,will calculate the rule,the match_type is %s, match_action is %s , match_property is %s , content is %s for ++ operator " %(i,match_type,match_action,match_property,content))
+
 			if content_array_flags  == 0:
 			#file stuff
 				if match_type == "file":
 					if condition == "regex":
-						if content in i["object1"]:
+						ret=do_search(0, content, i["object1"])
+						if ret == 1:
 							matched+=1
 	
-					if condition == "is":
+					if condition == "is" or condition == "eq":
 						if content == i["object1"]:
+							matched+=1
+					if  condition == "eq_i":
+						if content.upper() == i["object1"].upper():
 							matched+=1
 			
 					if condition == "regex_i":
-						if content.upper() in i["object1"].upper():
+						ret=do_search(1,content, i["object1"])
+						if ret == 1:
 							matched+=1
 	
 			
 	
 			#reg stuff
 				if match_type == "registry":
+
+
 					if condition == "regex":
-						if content in i["object1"]:
+						ret=do_search(0, content, i["object1"])
+						if ret == 1:
 							matched+=1
 	
-					if condition == "is":
+					if condition == "is" or condition == "eq":
 						if content == i["object1"]:
 							matched+=1
-					if condition == "regex_i":
-						if content.upper() in i["object1"].upper():
+					if  condition == "eq_i":
+						if content.upper() == i["object1"].upper():
 							matched+=1
+			
+					if condition == "regex_i":
+						ret=do_search(1,content, i["object1"])
+						if ret == 1:
+							matched+=1
+
 			#process stuff
 				if match_type == "process":
 					logger.debug("bobo match the process rule,the process path is %s"%(i["object2"]))
+
+
 					if condition == "regex":
-						if content in i["object1"]:
+						ret=do_search(0, content, i["object1"])
+						if ret == 1:
 							matched+=1
 	
-					if condition == "is":
+					if condition == "is" or condition == "eq":
 						if content == i["object1"]:
 							matched+=1
-					if condition == "regex_i":
-						logger.debug(content)
-						if content.upper() in i["object1"].upper():
+					if  condition == "eq_i":
+						if content.upper() == i["object1"].upper():
 							matched+=1
+			
+					if condition == "regex_i":
+						ret=do_search(1,content, i["object1"])
+						if ret == 1:
+							matched+=1
+
 					# it means the content value is other rule value instead of literal text
 					if condition ==  "cross_match":
 						#find matched items to get the value 
@@ -700,62 +814,90 @@ def match_rule_times(item, process_info, parent_code):
 			if content_array_flags  == 1:
 			#file stuff
 				if match_type == "file":
-					for  j  in  content_list:
-						if condition == "regex":
-							if j[0] in i["object1"]:
+					# content_list is [text, code]
+					if condition == "regex":
+						for  j  in  content_list:
+							ret=do_search(0, j[0], i["object1"])
+							if ret == 1:
 								matched+=1
 								code=j[1]
-					if condition == "is":
-						for j  in content_list:
+					if condition == "is" or condition == "eq":
+						for  j  in  content_list:
 							if j[0] == i["object1"]:
 								matched+=1
 								code=j[1]
-					if condition == "regex_i":
-						for j  in content_list:
-							print content_list
-							if j[0].upper() in i["object1"].upper():
+						
+					if  condition == "eq_i":
+						for  j  in  content_list:
+							if j[0].upper() == i["object1"].upper():
 								matched+=1
 								code=j[1]
-	
+					if condition == "regex_i":
+						for  j  in  content_list:
+							ret=do_search(1,j[0], i["object1"])
+							if ret == 1:
+								matched+=1
+								code=j[1]
 			
 	
 			#reg stuff
 				if match_type == "registry":
+
+					# content_list is [text, code]
 					if condition == "regex":
-						for j in content_list:
-							if j[0] in i["object1"]:
+						for  j  in  content_list:
+							ret=do_search(0, j[0], i["object1"])
+							if ret == 1:
 								matched+=1
 								code=j[1]
-	
-					if condition == "is":
-						for j[0] in content_list:
-							if j == i["object1"]:
-								code=j[1]
+					if condition == "is" or condition == "eq":
+						for  j  in  content_list:
+							if j[0] == i["object1"]:
 								matched+=1
+								code=j[1]
+						
+					if  condition == "eq_i":
+						for  j  in  content_list:
+							if j[0].upper() == i["object1"].upper():
+								matched+=1
+								code=j[1]
 					if condition == "regex_i":
-						for j in content_list:
-							if j[0].upper() in i["object1"].upper():
+						for  j  in  content_list:
+							ret=do_search(1,j[0], i["object1"])
+							if ret == 1:
 								matched+=1
 								code=j[1]
 			#process stuff
 				if match_type == "process":
 					logger.debug("bobo match the process rule,the process path is %s"%(i["object2"]))
+
+
+
+					# content_list is [text, code]
 					if condition == "regex":
-						for j  in content_list:
-							if j[0] in i["object1"]:
+						for  j  in  content_list:
+							ret=do_search(0, j[0], i["object1"])
+							if ret == 1:
 								matched+=1
 								code=j[1]
-	
-					if condition == "is":
-						for j[0]  in content_list:
-							if j == i["object1"]:
-								code=j[1]
+					if condition == "is" or condition == "eq":
+						for  j  in  content_list:
+							if j[0] == i["object1"]:
 								matched+=1
+								code=j[1]
+						
+					if  condition == "eq_i":
+						for  j  in  content_list:
+							if j[0].upper() == i["object1"].upper():
+								matched+=1
+								code=j[1]
 					if condition == "regex_i":
-						for j  in content_list:
-							if j[0].upper() in i["object1"].upper():
+						for  j  in  content_list:
+							ret=do_search(1,j[0], i["object1"])
+							if ret == 1:
 								matched+=1
 								code=j[1]
+
 					# it means the content value is other rule value instead of literal text
 					if condition ==  "cross_match":
 						#find matched items to get the value 
@@ -772,12 +914,13 @@ def match_rule_times(item, process_info, parent_code):
 							if i["object2"].upper() == foo.upper():
 								matched+=1 
 
+
 			logger.debug("in match_rule_times:  the current log  type/action is matched, and the times of match %d "%(matched))
 		else:
 			logger.debug("in match_rule_times: the current type is %s, item need type is %s : the current action is %s, the item  action is %s , continue to next log " %(i["type"],i["action"], match_type,match_action))
 
-	if matched == 1:
-		logger.debug(" line %s Matchs a rule !!!!!" %(i))
+
+
 	logger.debug("the match number for this item is %d"%(matched))
 	return matched
 
@@ -880,49 +1023,73 @@ def match_rule(item, process_info, parent_code):
 		logger.debug("process the %dth log  total current log number %d  for seq %d ,log content:%s "%(log_index,len(process_info["information"]), seq_index,i))
 		if  i["type"] ==match_type and i["action"] == match_action :
 			logger.debug( "we found  a type/action line %s,will calculate the rule,the match_type is %s, match_action is %s , match_property is %s , content is %s " %(i,match_type,match_action,match_property,content))
+
+
 			if content_array_flags  == 0:
 			#file stuff
 				if match_type == "file":
 					if condition == "regex":
-						if content in i["object1"]:
+						ret=do_search(0, content, i["object1"])
+						if ret == 1:
 							matched=1
 	
-					if condition == "is":
+					if condition == "is" or condition == "eq":
 						if content == i["object1"]:
+							matched=1
+					if  condition == "eq_i":
+						if content.upper() == i["object1"].upper():
 							matched=1
 			
 					if condition == "regex_i":
-						if content.upper() in i["object1"].upper():
+						ret=do_search(1,content, i["object1"])
+						if ret == 1:
 							matched=1
 	
 			
 	
 			#reg stuff
 				if match_type == "registry":
+
+
 					if condition == "regex":
-						if content in i["object1"]:
+						ret=do_search(0, content, i["object1"])
+						if ret == 1:
 							matched=1
 	
-					if condition == "is":
+					if condition == "is" or condition == "eq":
 						if content == i["object1"]:
 							matched=1
-					if condition == "regex_i":
-						if content.upper() in i["object1"].upper():
+					if  condition == "eq_i":
+						if content.upper() == i["object1"].upper():
 							matched=1
+			
+					if condition == "regex_i":
+						ret=do_search(1,content, i["object1"])
+						if ret == 1:
+							matched=1
+
 			#process stuff
 				if match_type == "process":
 					logger.debug("bobo match the process rule,the process path is %s"%(i["object2"]))
+
+
 					if condition == "regex":
-						if content in i["object1"]:
+						ret=do_search(0, content, i["object1"])
+						if ret == 1:
 							matched=1
 	
-					if condition == "is":
+					if condition == "is" or condition == "eq":
 						if content == i["object1"]:
 							matched=1
-					if condition == "regex_i":
-						logger.debug(content)
-						if content.upper() in i["object1"].upper():
+					if  condition == "eq_i":
+						if content.upper() == i["object1"].upper():
 							matched=1
+			
+					if condition == "regex_i":
+						ret=do_search(1,content, i["object1"])
+						if ret == 1:
+							matched=1
+
 					# it means the content value is other rule value instead of literal text
 					if condition ==  "cross_match":
 						#find matched items to get the value 
@@ -941,62 +1108,90 @@ def match_rule(item, process_info, parent_code):
 			if content_array_flags  == 1:
 			#file stuff
 				if match_type == "file":
-					for  j  in  content_list:
-						if condition == "regex":
-							if j[0] in i["object1"]:
+					# content_list is [text, code]
+					if condition == "regex":
+						for  j  in  content_list:
+							ret=do_search(0, j[0], i["object1"])
+							if ret == 1:
 								matched=1
 								code=j[1]
-					if condition == "is":
-						for j  in content_list:
+					if condition == "is" or condition == "eq":
+						for  j  in  content_list:
 							if j[0] == i["object1"]:
 								matched=1
 								code=j[1]
-					if condition == "regex_i":
-						for j  in content_list:
-							print content_list
-							if j[0].upper() in i["object1"].upper():
+						
+					if  condition == "eq_i":
+						for  j  in  content_list:
+							if j[0].upper() == i["object1"].upper():
 								matched=1
 								code=j[1]
-	
+					if condition == "regex_i":
+						for  j  in  content_list:
+							ret=do_search(1,j[0], i["object1"])
+							if ret == 1:
+								matched=1
+								code=j[1]
 			
 	
 			#reg stuff
 				if match_type == "registry":
+
+					# content_list is [text, code]
 					if condition == "regex":
-						for j in content_list:
-							if j[0] in i["object1"]:
+						for  j  in  content_list:
+							ret=do_search(0, j[0], i["object1"])
+							if ret == 1:
 								matched=1
 								code=j[1]
-	
-					if condition == "is":
-						for j[0] in content_list:
-							if j == i["object1"]:
-								code=j[1]
+					if condition == "is" or condition == "eq":
+						for  j  in  content_list:
+							if j[0] == i["object1"]:
 								matched=1
+								code=j[1]
+						
+					if  condition == "eq_i":
+						for  j  in  content_list:
+							if j[0].upper() == i["object1"].upper():
+								matched=1
+								code=j[1]
 					if condition == "regex_i":
-						for j in content_list:
-							if j[0].upper() in i["object1"].upper():
+						for  j  in  content_list:
+							ret=do_search(1,j[0], i["object1"])
+							if ret == 1:
 								matched=1
 								code=j[1]
 			#process stuff
 				if match_type == "process":
 					logger.debug("bobo match the process rule,the process path is %s"%(i["object2"]))
+
+
+
+					# content_list is [text, code]
 					if condition == "regex":
-						for j  in content_list:
-							if j[0] in i["object1"]:
+						for  j  in  content_list:
+							ret=do_search(0, j[0], i["object1"])
+							if ret == 1:
 								matched=1
 								code=j[1]
-	
-					if condition == "is":
-						for j[0]  in content_list:
-							if j == i["object1"]:
-								code=j[1]
+					if condition == "is" or condition == "eq":
+						for  j  in  content_list:
+							if j[0] == i["object1"]:
 								matched=1
+								code=j[1]
+						
+					if  condition == "eq_i":
+						for  j  in  content_list:
+							if j[0].upper() == i["object1"].upper():
+								matched=1
+								code=j[1]
 					if condition == "regex_i":
-						for j  in content_list:
-							if j[0].upper() in i["object1"].upper():
+						for  j  in  content_list:
+							ret=do_search(1,j[0], i["object1"])
+							if ret == 1:
 								matched=1
 								code=j[1]
+
 					# it means the content value is other rule value instead of literal text
 					if condition ==  "cross_match":
 						#find matched items to get the value 
@@ -1012,6 +1207,7 @@ def match_rule(item, process_info, parent_code):
 						for   foo in value_list:
 							if i["object2"].upper() == foo.upper():
 								matched =1 
+#######################
 			logger.debug("in match_rule:  the current log  type/action is matched, and the text compared result %d "%(matched))
 		else:
 			logger.debug("in match_rule: the current type is %s, item need type is %s : the current action is %s, the item  action is %s , continue to next log " %(i["type"],i["action"], match_type,match_action))
