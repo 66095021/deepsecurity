@@ -436,22 +436,40 @@ def match_rule_log(item, process_info,log,parent_code):
 			if content_array_flags  == 0:
 			#file stuff
 				if match_type == "file":
-					if condition == "regex":
-						ret=do_search(0, content, i["object1"])
-						if ret == 1:
-							matched=1
+					if match_property.upper() == "FilePath".upper():
+						if condition == "regex":
+							ret=do_search(0, content, i["object1"])
+							if ret == 1:
+								matched=1
 	
-					if condition == "is" or condition == "eq":
-						if content == i["object1"]:
-							matched=1
-					if  condition == "eq_i":
-						if content.upper() == i["object1"].upper():
-							matched=1
+						if condition == "is" or condition == "eq":
+							if content == i["object1"]:
+								matched=1
+						if  condition == "eq_i":
+							if content.upper() == i["object1"].upper():
+								matched=1
 			
-					if condition == "regex_i":
-						ret=do_search(1,content, i["object1"])
-						if ret == 1:
-							matched=1
+						if condition == "regex_i":
+							ret=do_search(1,content, i["object1"])
+							if ret == 1:
+								matched=1
+					if match_property.upper() == "Filetype".upper():
+						if condition == "regex":
+							ret=do_search(0, content, i["object1"].split('.')[-1])
+							if ret == 1:
+								matched=1
+	
+						if condition == "is" or condition == "eq":
+							if content == i["object1"].split('.')[-1]:
+								matched=1
+						if  condition == "eq_i":
+							if content.upper() == i["object1"].split('.')[-1].upper():
+								matched=1
+			
+						if condition == "regex_i":
+							ret=do_search(1,content, i["object1"].split('.')[-1])
+							if ret == 1:
+								matched=1
 	
 			
 	
@@ -517,30 +535,55 @@ def match_rule_log(item, process_info,log,parent_code):
 			#file stuff
 				if match_type == "file":
 					# content_list is [text, code]
-					if condition == "regex":
-						for  j  in  content_list:
-							ret=do_search(0, j[0], i["object1"])
-							if ret == 1:
-								matched=1
-								code=j[1]
-					if condition == "is" or condition == "eq":
-						for  j  in  content_list:
-							if j[0] == i["object1"]:
-								matched=1
-								code=j[1]
-						
-					if  condition == "eq_i":
-						for  j  in  content_list:
-							if j[0].upper() == i["object1"].upper():
-								matched=1
-								code=j[1]
-					if condition == "regex_i":
-						for  j  in  content_list:
-							ret=do_search(1,j[0], i["object1"])
-							if ret == 1:
-								matched=1
-								code=j[1]
+					if match_property.upper() == "FilePath".upper():
+						if condition == "regex":
+							for  j  in  content_list:
+								ret=do_search(0, j[0], i["object1"])
+								if ret == 1:
+									matched=1
+									code=j[1]
+						if condition == "is" or condition == "eq":
+							for  j  in  content_list:
+								if j[0] == i["object1"]:
+									matched=1
+									code=j[1]
+							
+						if  condition == "eq_i":
+							for  j  in  content_list:
+								if j[0].upper() == i["object1"].upper():
+									matched=1
+									code=j[1]
+						if condition == "regex_i":
+							for  j  in  content_list:
+								ret=do_search(1,j[0], i["object1"])
+								if ret == 1:
+									matched=1
+									code=j[1]
 			
+					if match_property.upper() == "FileType".upper():
+						if condition == "regex":
+							for  j  in  content_list:
+								ret=do_search(0, j[0], i["object1"].split('.')[-1])
+								if ret == 1:
+									matched=1
+									code=j[1]
+						if condition == "is" or condition == "eq":
+							for  j  in  content_list:
+								if j[0] == i["object1"].split('.')[-1]:
+									matched=1
+									code=j[1]
+							
+						if  condition == "eq_i":
+							for  j  in  content_list:
+								if j[0].upper() == i["object1"].split('.')[-1].upper():
+									matched=1
+									code=j[1]
+						if condition == "regex_i":
+							for  j  in  content_list:
+								ret=do_search(1,j[0], i["object1"].split('.')[-1])
+								if ret == 1:
+									matched=1
+									code=j[1]
 	
 			#reg stuff
 				if match_type == "registry":
@@ -670,6 +713,7 @@ def match_rule_times(item, process_info, parent_code):
 #only one element, it is a dict instead of list 
 	elif item["Content"]["@type"] == "array" and item["Content"]["Item"].__class__ is dict:
 		content=item["Content"]["Item"]["#text"]
+		content=format_content(content)
 		if "@code" not in item["Content"]["Item"].keys():
 			code=parent_code
 		else:
@@ -1028,24 +1072,42 @@ def match_rule(item, process_info, parent_code):
 			if content_array_flags  == 0:
 			#file stuff
 				if match_type == "file":
-					if condition == "regex":
-						ret=do_search(0, content, i["object1"])
-						if ret == 1:
-							matched=1
+					if match_property.upper() == "FilePath".upper():
+						if condition == "regex":
+							ret=do_search(0, content, i["object1"])
+							if ret == 1:
+								matched=1
 	
-					if condition == "is" or condition == "eq":
-						if content == i["object1"]:
-							matched=1
-					if  condition == "eq_i":
-						if content.upper() == i["object1"].upper():
-							matched=1
+						if condition == "is" or condition == "eq":
+							if content == i["object1"]:
+								matched=1
+						if  condition == "eq_i":
+							if content.upper() == i["object1"].upper():
+								matched=1
 			
-					if condition == "regex_i":
-						ret=do_search(1,content, i["object1"])
-						if ret == 1:
-							matched=1
+						if condition == "regex_i":
+							ret=do_search(1,content, i["object1"])
+							if ret == 1:
+								matched=1
 	
 			
+					if match_property.upper() == "FileType".upper():
+						if condition == "regex":
+							ret=do_search(0, content, i["object1"].split('.')[-1])
+							if ret == 1:
+								matched=1
+	
+						if condition == "is" or condition == "eq":
+							if content == i["object1"].split('.')[-1]:
+								matched=1
+						if  condition == "eq_i":
+							if content.upper() == i["object1"].split('.')[-1].upper():
+								matched=1
+			
+						if condition == "regex_i":
+							ret=do_search(1,content, i["object1"].split('.')[-1])
+							if ret == 1:
+								matched=1
 	
 			#reg stuff
 				if match_type == "registry":

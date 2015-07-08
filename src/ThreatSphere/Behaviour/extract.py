@@ -69,7 +69,7 @@ from analysis import *
 from geturl import * 
 from map_table import * 
 from gl import * 
-
+from justify import * 
 
 
 def do_url_rank_job(url,pid_info):
@@ -132,6 +132,35 @@ def update_svm_input(pid_info):
     pid_info["svm_input"].append(pid_info["origin_url_alexa_code"])
     pid_info["svm_input"].append(pid_info["origin_url_scan_code"])
     logger.debug("update_svm_input done,the new input is %s"%(pid_info["svm_input"]))
+    logger.debug("will set the good/bad ")
+    pid_info["goodbad"]=get_beh_svm_result(pid_info["svm_input"][0:15])
+    logger.debug("the application %s result %d "%(pid_info["process"],pid_info["goodbad"]))
+    if os.path.isfile("/tmp/application.txt"):
+        f=open("/tmp/application.txt","r")
+        old=f.readlines()
+        exist=0
+        for index, i  in enumerate(old):
+            if pid_info["process"] in  i:
+                old[index]=pid_info["process"]+"\t"+str(pid_info["goodbad"])+'\n'
+                exist=1
+                break
+        if exist == 1:
+            g=open("/tmp/application.txt","w")
+            g.writelines(old)
+            g.close()
+        else:
+            g=open("/tmp/application.txt","w")
+            record=pid_info["process"]+"\t"+str(pid_info["goodbad"])+'\n'  
+            old.append(record)
+            g.writelines(old)
+            g.close()
+    else:
+         logger.debug("there is no application "%())
+         g=open("/tmp/application.txt","w")
+         g.write(pid_info["process"]+"\t"+str(pid_info["goodbad"])+'\n')
+         g.close()
+
+
 #get file type from  name 
 def set_file_type_code(pid_info):
     process_name=pid_info["process"] 
@@ -434,6 +463,7 @@ def  analysis_it(self,path_behavior):
                     i["behavior_result"]=ret
     	            i["behavior_code"]=code
       	            i["behavior_log_number"]=logs_number
+                    update_svm_input(i)
     	            #logger.debug("current pid seq %d behavior %s %s %s"%(f,name,ret,code))
     	            logger.debug("log increase: the new info current pid seq %d behavior name:%s bin:%s code: %s svm_input:%s, pid is %s process name is %s  "%(f,name,ret,code,i["svm_input"],i["processId"],i["process"]))
 	

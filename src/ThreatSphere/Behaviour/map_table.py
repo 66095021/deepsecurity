@@ -7,7 +7,7 @@ window_macro_map={
 "%ProgramFiles%" : 'c:\\Program files',
 "%Temp%":  'C:\\Users\\bcheng\\AppData\\Local\\Temp',
 "%AppData%":  'C:\\Users\\bcheng\\AppData\\Roaming ',  
-"%UserProfile%": ' C:\\Users\\foo',
+"%UserProfile%": 'C:\\Users\\bcheng',
 "%HoneyPotHome": 'C:\\test'
 
 }
@@ -17,7 +17,7 @@ pwd_process={
 "%ProgramFiles%" : 'c:\\Program files',
 "%Temp%":  'C:\\Users\\bcheng\\AppData\\Local\\Temp',
 "%AppData%":  'C:\\Users\\bcheng\\AppData\\Roaming ',  
-"%UserProfile%": ' C:\\Users\\foo'
+"%UserProfile%": 'C:\\Users\\bcheng'
 
 
 }
