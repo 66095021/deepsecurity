@@ -298,10 +298,10 @@ type_map={
 
 action_map={
 "CreateFile":"Create",	
-"WriteFile":"Write",
-"ReadFile":"Read",
+"WriteFile":"write",
+"ReadFile":"read",
 "CreateProcess":"created",
-"SetRegistry":"SetValueKey",
+"SetRegistry":"Modified",
 "QueryRegistry":"GetValueKey"
 
 }

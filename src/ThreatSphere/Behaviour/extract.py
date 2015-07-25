@@ -121,7 +121,7 @@ def update_svm_input(pid_info):
         if bin[i] == 0 or bin[i] == '0':
             pid_info["svm_input"].append(0)
         else:
-            pid_info["svm_input"].append(code[i])
+            pid_info["svm_input"].append(int(code[i]))
         i+=1
 
 # add other 
@@ -135,31 +135,76 @@ def update_svm_input(pid_info):
     logger.debug("will set the good/bad ")
     pid_info["goodbad"]=get_beh_svm_result(pid_info["svm_input"][0:15])
     logger.debug("the application %s result %d "%(pid_info["process"],pid_info["goodbad"]))
-    if os.path.isfile("/tmp/application.txt"):
-        f=open("/tmp/application.txt","r")
+#update db and db-version 
+
+    if os.path.isfile(sys.argv[3]):
+        f=open(sys.argv[3],"r")
         old=f.readlines()
         exist=0
+        exist_line=None
         for index, i  in enumerate(old):
-            if pid_info["process"] in  i:
-                old[index]=pid_info["process"]+"\t"+str(pid_info["goodbad"])+'\n'
+            if pid_info["process"].split('\\')[-1] in  i:
+                logger.debug("met the application %s in %s "%(pid_info["process"],sys.argv[3]))
+                #old[index]=pid_info["process"]+"\t"+str(pid_info["goodbad"])+'\n'
+                exist_line=i
                 exist=1
                 break
+        
         if exist == 1:
-            g=open("/tmp/application.txt","w")
-            g.writelines(old)
-            g.close()
+            value=int(exist_line.strip().split('\t')[-1])
+            logger.debug("the old value is %d, the new value is %d "%(value,pid_info["goodbad"]))
+            if value == pid_info["goodbad"]:
+               f.close()
+               logger.debug("the old and new is the same, just no update ")
+               return 
+            else:
+                for index , i  in enumerate(old):
+                    logger.debug("will update the result  ")
+                    if pid_info["process"].split('\\')[-1] in i:
+                        old[index]=pid_info["process"].split('\\')[-1]+"\t"+str(pid_info["goodbad"])+'\n'
+                        break
+                
+                       
+                f.close()
+                g=open(sys.argv[3],"w")
+                g.writelines(old)
+                logger.debug("the new content is %s  "%(old))
+                update_db_version(sys.argv[4])
+                g.close()
         else:
-            g=open("/tmp/application.txt","w")
-            record=pid_info["process"]+"\t"+str(pid_info["goodbad"])+'\n'  
+            logger.debug("there is no record for the application %s, will add it  "%(pid_info["process"]))
+            f.close()
+            g=open(sys.argv[3],"w")
+            record=pid_info["process"].split('\\')[-1]+"\t"+str(pid_info["goodbad"])+'\n'  
             old.append(record)
             g.writelines(old)
+            logger.debug("there is no record for the application %s, the new content is %s "%(pid_info["process"],old))
+            update_db_version(sys.argv[4])
             g.close()
     else:
-         logger.debug("there is no application "%())
-         g=open("/tmp/application.txt","w")
-         g.write(pid_info["process"]+"\t"+str(pid_info["goodbad"])+'\n')
-         g.close()
+        logger.debug("there is no such file  ")
+        g=open(sys.argv[3],"w")
+        g.write(pid_info["process"].split('\\')[-1]+"\t"+str(pid_info["goodbad"])+'\n')
+        logger.debug("directly write it %s ")
+        update_db_version(sys.argv[4])
+        g.close()
 
+
+def update_db_version(dbfile):
+    if not os.path.exists(dbfile):
+        f=open(dbfile,"w")
+        f.write("0")
+        f.close()
+        return 
+    f=open(dbfile,"r")
+    db_version=int(f.read())
+    db_version+=1
+    f.close()
+    f=open(dbfile,"w")
+    f.write(str(db_version))
+    f.close()
+    
+    
 
 #get file type from  name 
 def set_file_type_code(pid_info):
@@ -223,7 +268,7 @@ def get_meta_of_line(line):
             meta[i.replace("=", "").strip()]=str_split[str_split.index(i)+1]
         #meta[i.split("=")[0]]=i.split("=")[1].replace('"','')
     logger.debug("the dict of the line is %s" %(meta))
-    tup_birth = time.strptime(meta["time"].split('.')[0], "%d/%m/%Y-%H:%M:%S");
+    tup_birth = time.strptime(meta["time"].split('.')[0], "%Y/%m/%d-%H:%M:%S");
     birth_secds = time.mktime(tup_birth)   
     meta["utc_time"]=birth_secds
     return meta
@@ -388,16 +433,46 @@ number_loop=0;
 filelist=[]
 #contain the files is  done
 filedone=[]
+
+
+def get_last_files(filelist):
+    max_item=None
+    max_url_item=None
+
+    max=0
+    max_url=0
+    for index, i  in enumerate(filelist):
+        if "log-" in i:
+            logger.debug("in the filelist there are log-" )
+            current=i.split('-')[-1]
+            if  int(current) > max:
+                max=int(current)
+                max_item=i 
+            
+        if "logurl-" in i:
+            logger.debug("in the filelist there are logurl-" )
+            current=i.split('-')[-1]
+            if  int(current) > max_url:
+                max_url=int(current)
+                max_url_item=i 
+
+
+    return (max_item, max_url_item)
+
 def run_loop(self,dir):
     global number_loop
     while True:
         number_loop=number_loop+1
         #filelist=list(os.listdir(monitordir))
         filelist=get_files_for_dir(dir)
+        (last_log, last_url_log)=get_last_files(filelist) 
    #print filelist
         self.logger.debug("the loop number is %d, the total list is %s\n" %(number_loop,filelist))
         for i  in filelist:
             if not i in filedone:
+                if i == last_url_log or i == last_log:
+                    logger.debug("it is the last file  %s, ignore it" %(i))
+                    continue
                 get_pid_info_from_file(i)
                 self.logger.debug("I will add %s done list \n" %i)
                 filedone.append(i)
@@ -415,7 +490,7 @@ def  analysis_it(self,path_behavior):
     global extract_list
     while True:
 	
-        time.sleep(10)
+        time.sleep(60)
         for i in extract_list:
             if "information" not in i.keys():
                 f=extract_list.index(i)
@@ -507,6 +582,9 @@ if __name__ == "__main__":
     #get_pid_info_from_file(sys.argv[1])
     #run_loop(sys.argv[1])
     #try to mthread
+    if len(sys.argv) <5:
+        print "usage: ./extract.py logdir jsondir filedbdir filedbversiondir"
+        sys.exit(-1)
     signal.signal(signal.SIGINT, handler)
     signal.signal(signal.SIGTERM, handler)
     t=[]
