@@ -7,6 +7,33 @@ from bs4 import BeautifulSoup
 from urlparse import urlparse
 import tldextract
 
+def get_orgin_dst_ip(filename):
+	
+	try:
+		f=open("/var/ThreatSphere/uploadfile.meta", 'r')
+		s=f.readlines()
+		for i in s:
+			i.strip()
+			j=json.loads(i)
+			if filename == j["filename"]:
+				foo=   json.loads(j["meta"])
+				return str(foo["details"][0]).split('\r\n')[0].strip('[]').split(',')[2].split("=")[1]
+	except:
+		return None
+def get_orgin_client_ip(filename):
+	
+	try:
+		f=open("/var/ThreatSphere/uploadfile.meta", 'r')
+		s=f.readlines()
+		for i in s:
+			i.strip()
+			j=json.loads(i)
+			if filename == j["filename"]:
+				foo=   json.loads(j["meta"])
+				return str(foo["details"][0]).split('\r\n')[0].strip('[]').split(',')[0].split("=")[1]
+	except:
+		return None
+
 def get_orgin_url(filename):
 	try:
 		f=open("/var/ThreatSphere/uploadfile.meta", 'r')
@@ -63,5 +90,6 @@ def get_url_rank(url):
 
 #argv shoule be scheme://hostname/url../
 if __name__ == '__main__':
-	print get_url_rank(sys.argv[1])
+	print get_orgin_client_ip("putty.exe")
+	print get_orgin_dst_ip("putty.exe")
 	print get_orgin_url("putty.exe")

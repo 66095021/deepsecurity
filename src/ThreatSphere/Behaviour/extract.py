@@ -71,7 +71,7 @@ from map_table import *
 from gl import * 
 from justify import * 
 
-
+bad_list={}
 def do_url_rank_job(url,pid_info):
         logger.debug("url event, %s will get the ranks for PID %s process %s!"%(url,pid_info["processId"],pid_info["process"]))
         res=get_url_rank(url)      
@@ -135,6 +135,16 @@ def update_svm_input(pid_info):
     logger.debug("will set the good/bad ")
     pid_info["goodbad"]=get_beh_svm_result(pid_info["svm_input"][0:15])
     logger.debug("the application %s result %d "%(pid_info["process"],pid_info["goodbad"]))
+
+
+# send to incident server when it is bad, only send one time
+
+   if pid_info["goodbad"] == 1:
+       if pid_info["process"] not in bad_list:
+           bad_list.append(pid_info["process"])
+           os.system("./posterincidenturl.py" +" " +"127.0.0.1" + " " + get_orgin_client_ip(pid_info["process"].split('\\')[-1]) , +" " + get_orgin_dst_ip( pid_info["process"].split('\\')[-1]) ,+ " " + get_orgin_url(pid_info["process"].split('\\')[-1]) ,  "malicous")
+
+       
 #update db and db-version 
 
     if os.path.isfile(sys.argv[3]):
