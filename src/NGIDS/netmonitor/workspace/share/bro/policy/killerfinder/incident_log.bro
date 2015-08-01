@@ -242,7 +242,8 @@ event Notice::log_notice(rec: Notice::Info){
       if (rec?$sub)
         url += "; " + rec$sub;
 
-      local cmd = fmt("%s \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" ", sendincidentlog, incident_log_server, src, dst, url, rec$note);
+      # posterincidenturl.py server_ip src_ip dst_ip url type detector direction
+      local cmd = fmt("%s \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" 0 1", sendincidentlog, incident_log_server, src, dst, url, rec$note);
       debug("cmd : " + cmd);
       system(cmd);
     }

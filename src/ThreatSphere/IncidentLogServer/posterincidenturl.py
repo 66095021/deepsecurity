@@ -8,7 +8,7 @@ import sys
 
 #the capture listens on 58080 
 
-import magic
+#import magic
 import sys
 
 import json 
@@ -33,6 +33,8 @@ incident_log_json_info ={
 "type":"virus",
 "time": "seconds UTC",
 "usage agent": "IE/Firefox",
+"detector":"0",
+"direction":"1",
 }
 
 
@@ -85,5 +87,7 @@ if __name__ == "__main__":
            incident_log_json_info["incident_url"]=sys.argv[4]
            incident_log_json_info["type"]=sys.argv[5]
            incident_log_json_info["time"]=time.ctime()
+           incident_log_json_info["detector"]=sys.argv[6]
+           incident_log_json_info["direction"]=sys.argv[7]
            #send_forensic_data_to_server(sys.argv[1])
            send_incident_log_to_server( sys.argv[1])
