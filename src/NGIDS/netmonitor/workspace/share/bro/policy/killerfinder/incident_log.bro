@@ -1,5 +1,4 @@
 
-
 redef enum Notice::Type += {
     IP4_MAL,
     IP6_MAL,
@@ -34,6 +33,11 @@ type http_mal_state: enum {
 redef record HTTP::Info += {
     malicous_state : http_mal_state  &log &default = MAL_NONE;
 };
+
+redef record Files::Info += {
+    malicious_state : http_mal_state &log &default = MAL_NONE;
+};
+
 
 global http_ip4_list: table[addr] of Val = table();
 global http_domain_list: table[string] of Val = table();
@@ -127,7 +131,7 @@ event http_header(c: connection, is_orig: bool, name: string, value: string)
           if (c$http$malicous_state == MAL_NONE){
               debug(fmt("hostname1 search begin: %s",current_time()));
               if (value in http_hostname1_list){
-                  debug(fmt("hostname1 search end1: %s",current_time()));
+                  debug(fmt("hostnamec$http?$malicous_state1 search end1: %s",current_time()));
                   c$http$malicous_state = HOSTNAME1_HIT;
                   #NOTICE([$note=HOSTNAME_MAL,
                   #                        $msg=fmt("malicious hostname %s found", value),
@@ -158,6 +162,23 @@ event http_header(c: connection, is_orig: bool, name: string, value: string)
        }
 }
 
+event file_new(f:fa_file)
+{
+    debug("+file_new "+f$id);
+    local fname = f$id;
+    for (id in f$conns){
+      local c = f$conns[id];
+      if ( c?$http && c$http?$malicous_state){
+        if (c$http$malicous_state != MAL_NONE && c$http$malicous_state != HOSTNAME2_HIT){
+            debug("create a file " + fname);
+            Files::add_analyzer(f, Files::ANALYZER_EXTRACT, [$extract_filename=fname]);
+            f$info$malicious_state = c$http$malicous_state;
+        }
+      }
+    }
+}
+
+
 type SqliteVal: record {
     url: string;
     cat: int;
@@ -182,6 +203,7 @@ event line_url(description: Input::EventDescription, tpe: Input::Event, r: Sqlit
                 $dst=to_addr(parts[2])]);
     }
 }
+
 
 event http_message_done(c: connection, is_orig: bool, stat: http_message_stat)
 {

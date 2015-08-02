@@ -1,3 +1,4 @@
+@load killerfinder/incident_log
 export{
 
     global extract_name_from_uri: function (uri : string) : string; 
@@ -125,7 +126,10 @@ redef record Files::Info += {
 
 function cared_type(f:fa_file):bool
 {
-    
+    if (f$info$malicious_state != MAL_NONE && f$info$malicious_state != HOSTNAME2_HIT){
+        return T;
+    }
+ 
     if ( ! f?$mime_type ){
         return T;
     }
@@ -252,6 +256,7 @@ event tcp_packet(c: connection , is_orig: bool , flags: string , seq: count , ac
 
 function is_file_cared(rec: Files::Info):bool
 {
+
     local hs = "";
 	if (rec?$tx_hosts){
         for (h in rec$tx_hosts){
