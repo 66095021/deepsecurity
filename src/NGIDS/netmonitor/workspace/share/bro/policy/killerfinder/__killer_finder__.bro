@@ -30,10 +30,11 @@ export {
   global httpdomaindb="/usr/local/bro/db/httpdomain.db";
   global httphostname1db="/usr/local/bro/db/httphostname1.db";
   global httphostname2db="/usr/local/bro/db/httphostname2.db";
+  global httpurldb="/usr/local/bro/db/httpurl.db";
   global sqlitdb="/usr/local/bro/db/brodb";
 
   global sendsuspiciousurl = "/usr/local/bro/bin/uploadurl.py";  
-  global sendincidentlog = "/usr/local/bro/bin/posterincidenturl.py";
+  global sendincidentlog = "/usr/local/bro/bin/postIncidentUrl.py";
   global sendrst = "/usr/local/bro/bin/rst";
   global nofileslog = T;
 
