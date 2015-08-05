@@ -31,16 +31,76 @@ type http_mal_state: enum {
    URL_HIT,  
 } &redef;
 
+
+
+######################################
+#
+# add current_header to http::info, 
+# write log to http.log
+#
+######################################
+
+type httphead: record {
+    req_h  : string &log;
+    res_h  : string &log;
+}; 
+
 redef record HTTP::Info += {
+    current_header : httphead &log &optional;
     malicous_state : http_mal_state  &log &default = MAL_NONE;
-    version : string &default = "HTTP/1.1";
+    version : string &log &default = "1.1";
 };
 
-redef record Files::Info += {
-    malicious_state : http_mal_state &log &default = MAL_NONE;
-};
+event http_request(c: connection , method: string , original_URI: string , unescaped_URI: string , version: string )
+{
+    debug("+http_request " + c$uid);
+    
+    if ( !c$http?$current_header ){
+        c$http$current_header = httphead($req_h="", $res_h="");
+    }else{
+        c$http$current_header$req_h="";
+        c$http$current_header$res_h="";
+    }
+    local content = fmt("%s %s HTTP/%s", method, original_URI, version) + line_sep;
+    c$http$current_header$req_h += content;
+}
+
+event http_reply(c: connection , version: string , code: count , reason: string )
+{
+    debug("+http_reply " + c$uid);
+    if ( c$http?$current_header ){
+        c$http$current_header$res_h= fmt("HTTP/%s %d %s",version,code,reason)+line_sep;
+    }
+
+}
 
 
+event http_all_headers(c: connection , is_orig: bool , hlist: mime_header_list )
+{
+    debug("+http_all_headers " + c$uid);
+    if (c$http?$current_header){
+        if(is_orig){
+            for (index in hlist){
+                c$http$current_header$req_h += 
+                   fmt("%s: %s",hlist[index]$name, hlist[index]$value) + line_sep;
+            }
+            c$http$current_header$req_h += line_sep;
+        }else{
+            for (index in hlist){
+                c$http$current_header$res_h +=
+                    fmt("%s: %s",hlist[index]$name, hlist[index]$value) + line_sep;
+            }
+            c$http$current_header$res_h += line_sep;
+        }
+    }
+}
+
+
+##################################################
+#
+#  add malicious db
+#
+###################################################
 global http_ip4_list: table[addr] of Val = table();
 global http_domain_list: table[string] of Val = table();
 global http_hostname1_list: table[string] of Val = table();
@@ -162,22 +222,6 @@ event http_header(c: connection, is_orig: bool, name: string, value: string)
        }
 }
 
-event file_new(f:fa_file)
-{
-    debug("+file_new "+f$id);
-    local fname = f$id;
-    for (id in f$conns){
-      local c = f$conns[id];
-      if ( c?$http && c$http?$malicous_state){
-        if (c$http$malicous_state != MAL_NONE && c$http$malicous_state != HOSTNAME2_HIT){
-            debug("create a file " + fname);
-            Files::add_analyzer(f, Files::ANALYZER_EXTRACT, [$extract_filename=fname]);
-            f$info$malicious_state = c$http$malicous_state;
-        }
-      }
-    }
-}
-
 
 type SqliteVal: record {
     url: string;
@@ -221,6 +265,35 @@ function send_incident_log(c: connection)
       system(cmd); 
     }
 }
+
+function incident_log(rec: HTTP::Info)
+{
+    debug(fmt("+incident_log %s", rec$malicous_state));
+    if (rec$malicous_state == IP4_HIT || 
+        rec$malicous_state == DOMAIN_HIT || 
+        rec$malicous_state == HOSTNAME1_HIT ||
+        rec$malicous_state == URL_HIT ){
+      debug("rec$malicous_state");
+      local srcip   = rec$id$orig_h;
+      local srcport = rec$id$orig_p;
+      local dstip   = rec$id$resp_h;
+      local dstport = rec$id$resp_p;
+      local req_h   = rec$current_header$req_h;
+      local res_h   = rec$current_header$res_h;
+      local req_bl  = rec$request_body_len;
+      local res_bl  = rec$response_body_len;
+      local method  = rec$method;
+      local url     = HTTP::build_url(rec);
+      local version = rec$version;
+      local res_code= rec$status_code;
+      local t       = rec$malicous_state;
+      
+      local cmd = fmt("%s -S \"%s\" -I \"%s\" -i \"%s\" -P \"%s\" -p \"%s\" -H \"%s\" -h \"%s\" -L \"%s\" -l \"%s\" -M \"%s\" -U \"%s\" -V \"%s\" -c \"%s\" -t \"%s\" -D 0 -d 1", sendincidentlog, incident_log_server, srcip, dstip, srcport, dstport, req_h, res_h, req_bl, res_bl, method, url, version, res_code, t);
+      debug("cmd : " + cmd);
+      system(cmd);
+    }
+}
+
 
 event line_url(description: Input::EventDescription, tpe: Input::Event, r: SqliteVal)
 {
@@ -274,40 +347,16 @@ event http_message_done(c: connection, is_orig: bool, stat: http_message_stat)
             #        ]);
             #break;
         }
-        send_incident_log(c);
     }
 }
 
+event HTTP::log_http(rec: HTTP::Info)
+{
+    incident_log(rec);
+}
 
 event Notice::log_notice(rec: Notice::Info){
 
-    if (rec$note == IP4_MAL ||
-        rec$note == IP6_MAL ||
-        rec$note == DOMAIN_MAL ||
-        rec$note == HOSTNAME1_MAL ||
-        rec$note == HOSTNAME2_MAL ||
-        rec$note == URL_MAL ){
-      local srcip = "unknown";
-      if (rec?$src){
-        srcip = fmt("%s",rec$src);
-      }
-
-      local dstip = "unknown";
-      if (rec?$dst){
-        dstip = fmt("%s",rec$dst);
-      }
-    
-      local url = "unknown";
-      if (rec?$msg)
-        url = rec$msg;
-      if (rec?$sub)
-        url += "; " + rec$sub;
-
-      # posterincidenturl.py server_ip src_ip dst_ip url type detector direction
-      #local cmd = fmt("%s \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" 0 1", sendincidentlog, incident_log_server, src, dst, url, rec$note);
-      #debug("cmd : " + cmd);
-      #system(cmd);
-    }
 }
 
 

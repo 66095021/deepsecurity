@@ -34,14 +34,14 @@ export {
   global sqlitdb="/usr/local/bro/db/brodb";
 
   global sendsuspiciousurl = "/usr/local/bro/bin/uploadurl.py";  
-  global sendincidentlog = "/usr/local/bro/bin/postIncidentUrl.py";
+  global sendincidentlog = "/usr/local/bro/bin/postIncidentLog.py";
   global sendrst = "/usr/local/bro/bin/rst";
   global nofileslog = T;
 
 
 
   global debug_enabled = T;
-  global line_sep = "\r\n";
+  global line_sep = "\\u000a\\u000d";
 
   
   global file_caredprotocols : set[string] = set(
