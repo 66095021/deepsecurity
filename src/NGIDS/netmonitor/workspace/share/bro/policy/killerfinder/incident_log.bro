@@ -278,8 +278,8 @@ function incident_log(rec: HTTP::Info)
       local srcport = rec$id$orig_p;
       local dstip   = rec$id$resp_h;
       local dstport = rec$id$resp_p;
-      local req_h   = rec$current_header$req_h;
-      local res_h   = rec$current_header$res_h;
+      local req_h   = subst_string(rec$current_header$req_h, line_sep, "\\u000d\\u000a");
+      local res_h   = subst_string(rec$current_header$res_h, line_sep, "\\u000d\\u000a");
       local req_bl  = rec$request_body_len;
       local res_bl  = rec$response_body_len;
       local method  = rec$method;
