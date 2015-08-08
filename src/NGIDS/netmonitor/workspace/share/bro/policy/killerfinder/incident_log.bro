@@ -41,14 +41,16 @@ type http_mal_state: enum {
 ######################################
 
 type httphead: record {
-    req_h  : string &log;
-    res_h  : string &log;
+    req_h  : string &log &default = "-";
+    res_h  : string &log &default = "-";
 }; 
 
 redef record HTTP::Info += {
     current_header : httphead &log &optional;
     malicous_state : http_mal_state  &log &default = MAL_NONE;
-    version : string &log &default = "1.1";
+    version : string &log &default = "-";
+    fname   : string &log &default = "-";
+    url     : string &log &default = "-";
 };
 
 event http_request(c: connection , method: string , original_URI: string , unescaped_URI: string , version: string )
@@ -168,6 +170,7 @@ event http_request(c: connection , method: string , original_URI: string , unesc
     }
     #debug(fmt("ip search end2: %s",current_time()));
 
+    c$http$fname = extract_name_from_uri(original_URI);
 }
 
 
@@ -283,7 +286,7 @@ function incident_log(rec: HTTP::Info)
       local req_bl  = rec$request_body_len;
       local res_bl  = rec$response_body_len;
       local method  = rec$method;
-      local url     = HTTP::build_url(rec);
+      local url     = rec$url;
       local version = rec$version;
       local res_code= rec$status_code;
       local t       = rec$malicous_state;
@@ -312,6 +315,10 @@ event line_url(description: Input::EventDescription, tpe: Input::Event, r: Sqlit
 
 event http_message_done(c: connection, is_orig: bool, stat: http_message_stat)
 {
+    if (!is_orig){
+        c$http$url = "http://" + HTTP::build_url(c$http);
+    }
+
     if ( is_orig && c?$http ){
         local url = HTTP::build_url(c$http);
         switch (c$http$malicous_state){

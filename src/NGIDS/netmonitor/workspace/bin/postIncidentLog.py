@@ -53,6 +53,7 @@ if __name__ == "__main__":
 		"req_body_len":"0",
 		"res_body_len":"5",
 		"method":"GET",
+                "url":"http://www.baidu.com/",
 		"version":"HTTP/1.1",
 		"res_code":"200",
 		"type":"MAL_HOSTNAME1",
@@ -81,6 +82,8 @@ if __name__ == "__main__":
 			dic["res_body_len"] = value
 		elif op == "-M":
 			dic["method"] = value
+                elif op == "-U":
+                        dic["url"] = value
 		elif op == "-V":
 			dic["version"] = value
 		elif op == "-c":
